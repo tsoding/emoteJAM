@@ -1,0 +1,3 @@
+- [ ] Customize the emote image
+- [ ] Render the emote button
+- [ ] More shader presets
