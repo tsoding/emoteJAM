@@ -1,3 +1,9 @@
+const TRIANGLE_PAIR = 2;
+const TRIANGLE_VERTICIES = 3;
+const VEC2_COUNT = 2;
+const VEC2_X = 0;
+const VEC2_Y = 1;
+
 function shaderTypeToString(gl, shaderType) {
     switch (shaderType) {
     case gl.VERTEX_SHADER: return 'Vertex';
@@ -99,6 +105,48 @@ function createTextureFromImage(gl, image) {
     return textureId;
 }
 
+function render(gl, canvas, timeUniform, resolutionUniform) {
+    var gif = new GIF({
+        workers: 5,
+        quality: 10,
+        width: canvas.width,
+        height: canvas.height,
+    });
+
+    let fps = 30;
+    let dt = 1.0 / fps;
+    let duration = Math.PI / 3.0;
+    let frameCount = 100;
+
+    let t = 0.0;
+    while (t <= duration) {
+        gl.uniform1f(timeUniform, t);
+        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
+
+        let pixels = new Uint8ClampedArray(4 * canvas.width * canvas.height);
+        gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        console.log(canvas.width);
+        gif.addFrame(new ImageData(pixels, canvas.width, canvas.height), {
+            delay: dt * 1000,
+            dispose: 2,
+        });
+        t += dt;
+    }
+
+    gif.on('finished', (blob) => {
+        window.open(URL.createObjectURL(blob));
+    });
+
+    gif.on('progress', (p) => {
+        console.log(`progress ${p}`);
+    });
+
+    gif.render();
+}
+
 window.onload = () => {
     let vertexAttribs = {
         "meshPosition": 0
@@ -121,12 +169,6 @@ window.onload = () => {
     let resolutionUniform = gl.getUniformLocation(program, 'resolution');
     let timeUniform = gl.getUniformLocation(program, 'time');
 
-    const TRIANGLE_PAIR = 2;
-    const TRIANGLE_VERTICIES = 3;
-    const VEC2_COUNT = 2;
-    const VEC2_X = 0;
-    const VEC2_Y = 1;
-
     // Bitmap Font
     {
         const customPreview = document.querySelector("#custom-preview");
@@ -140,6 +182,11 @@ window.onload = () => {
         const customFile = document.querySelector("#custom-file");
         customFile.onchange = function() {
             customPreview.src = URL.createObjectURL(this.files[0]);
+        };
+
+        const renderButton = document.querySelector("#render");
+        renderButton.onclick = function() {
+            render(gl, canvas, timeUniform, resolutionUniform);
         };
     }
 
@@ -173,65 +220,21 @@ window.onload = () => {
         gl.enableVertexAttribArray(meshPositionAttrib);
     }
 
-    let preview = true;
-
-    if (preview) {
-        let start;
-        function step(timestamp) {
-            if (start === undefined) {
-                start = timestamp;
-            }
-            const dt = (timestamp - start) * 0.001;
+    let start;
+    function step(timestamp) {
+        if (start === undefined) {
             start = timestamp;
-
-            gl.uniform1f(timeUniform, start * 0.001);
-            gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
-
-            gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
-
-            window.requestAnimationFrame(step);
         }
+        const dt = (timestamp - start) * 0.001;
+        start = timestamp;
+
+        gl.uniform1f(timeUniform, start * 0.001);
+        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+
+        gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
 
         window.requestAnimationFrame(step);
-    } else {
-        var gif = new GIF({
-            workers: 5,
-            quality: 10,
-            width: canvas.width,
-            height: canvas.height,
-        });
-
-        let fps = 30;
-        let dt = 1.0 / fps;
-        let duration = Math.PI / 3.0;
-        let frameCount = 100;
-
-        let t = 0.0;
-        while (t <= duration) {
-            gl.uniform1f(timeUniform, t);
-            gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
-            gl.clearColor(0.0, 0.0, 0.0, 0.0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
-
-            let pixels = new Uint8ClampedArray(4 * canvas.width * canvas.height);
-            gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-            console.log(canvas.width);
-            gif.addFrame(new ImageData(pixels, canvas.width, canvas.height), {
-                delay: dt * 1000,
-                dispose: 2,
-            });
-            t += dt;
-        }
-
-        gif.on('finished', (blob) => {
-            window.open(URL.createObjectURL(blob));
-        });
-
-        gif.on('progress', (p) => {
-            console.log(`progress ${p}`);
-        });
-
-        gif.render();
     }
+
+    window.requestAnimationFrame(step);
 }
