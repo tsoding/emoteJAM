@@ -79,8 +79,27 @@ void main() {
 }
 `;
 
-window.onload = () => {
+function createTextureFromImage(gl, image) {
+    let textureId = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, textureId);
+    gl.texImage2D(
+        gl.TEXTURE_2D,    // target
+        0,                // level
+        gl.RGBA,          // internalFormat
+        gl.RGBA,          // srcFormat
+        gl.UNSIGNED_BYTE, // srcType
+        image             // image
+    );
 
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    return textureId;
+}
+
+window.onload = () => {
     let vertexAttribs = {
         "meshPosition": 0
     };
@@ -110,23 +129,20 @@ window.onload = () => {
 
     // Bitmap Font
     {
-        const emoteImage = document.getElementById('emote');
-        let emoteTexture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, emoteTexture);
-        gl.texImage2D(
-            gl.TEXTURE_2D,    // target
-            0,                // level
-            gl.RGBA,          // internalFormat
-            gl.RGBA,          // srcFormat
-            gl.UNSIGNED_BYTE, // srcType
-            emoteImage   // image
-        );
+        const customPreview = document.querySelector("#custom-preview");
+        let emoteTexture = createTextureFromImage(gl, customPreview);
 
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        customPreview.onload = function() {
+            gl.deleteTexture(emoteTexture);
+            emoteTexture = createTextureFromImage(gl, customPreview);
+        };
+
+        const customFile = document.querySelector("#custom-file");
+        customFile.onchange = function() {
+            customPreview.src = URL.createObjectURL(this.files[0]);
+        };
     }
+
 
     // Mesh Position
     {
@@ -157,7 +173,7 @@ window.onload = () => {
         gl.enableVertexAttribArray(meshPositionAttrib);
     }
 
-    let preview = false;
+    let preview = true;
 
     if (preview) {
         let start;
