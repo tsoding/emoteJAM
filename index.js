@@ -40,7 +40,9 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
     return program;
 }
 
-vertexShaderSource = `#version 100
+const presets = {
+    "clowning": {
+        "vertex": `#version 100
 
 precision mediump float;
 
@@ -61,9 +63,8 @@ void main() {
         1.0);
     uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
 }
-`;
-
-fragmentShaderSource = `#version 100
+`,
+        "fragment": `#version 100
 
 precision mediump float;
 
@@ -83,7 +84,9 @@ void main() {
         1.0);
     gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
 }
-`;
+`
+    }
+};
 
 function createTextureFromImage(gl, image) {
     let textureId = gl.createTexture();
@@ -161,8 +164,8 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let vertexShader = compileShaderSource(gl, vertexShaderSource, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+    let vertexShader = compileShaderSource(gl, presets.clowning.vertex, gl.VERTEX_SHADER);
+    let fragmentShader = compileShaderSource(gl, presets.clowning.fragment, gl.FRAGMENT_SHADER);
     let program = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.useProgram(program);
 
