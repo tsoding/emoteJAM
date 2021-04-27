@@ -85,6 +85,37 @@ void main() {
     gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
 }
 `
+    },
+    "JAM": {
+        "vertex": `#version 100
+precision mediump float;
+attribute vec2 meshPosition;
+
+varying vec2 uv;
+
+void main() {
+    gl_Position = vec4(
+        meshPosition,
+        0.0,
+        1.0);
+    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
+}
+`,
+        "fragment": `#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+void main() {
+    gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
+}
+`
     }
 };
 
