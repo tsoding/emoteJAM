@@ -108,7 +108,7 @@ function createTextureFromImage(gl, image) {
     return textureId;
 }
 
-function render(gl, canvas, timeUniform, resolutionUniform) {
+function render(gl, canvas, program) {
     var gif = new GIF({
         workers: 5,
         quality: 10,
@@ -123,8 +123,8 @@ function render(gl, canvas, timeUniform, resolutionUniform) {
 
     let t = 0.0;
     while (t <= duration) {
-        gl.uniform1f(timeUniform, t);
-        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+        gl.uniform1f(program.timeUniform, t);
+        gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
@@ -150,8 +150,22 @@ function render(gl, canvas, timeUniform, resolutionUniform) {
     gif.render();
 }
 
+function loadPresetsProgram(gl, preset, vertexAttribs) {
+    let vertexShader = compileShaderSource(gl, preset.vertex, gl.VERTEX_SHADER);
+    let fragmentShader = compileShaderSource(gl, preset.fragment, gl.FRAGMENT_SHADER);
+    let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    gl.useProgram(id);
+    return {
+        "id": id,
+        "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
+        "timeUniform": gl.getUniformLocation(id, 'time'),
+    };
+}
+
 window.onload = () => {
-    let vertexAttribs = {
+    const vertexAttribs = {
         "meshPosition": 0
     };
 
@@ -164,13 +178,7 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let vertexShader = compileShaderSource(gl, presets.clowning.vertex, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, presets.clowning.fragment, gl.FRAGMENT_SHADER);
-    let program = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
-    gl.useProgram(program);
-
-    let resolutionUniform = gl.getUniformLocation(program, 'resolution');
-    let timeUniform = gl.getUniformLocation(program, 'time');
+    let program = loadPresetsProgram(gl, presets.clowning, vertexAttribs);
 
     // Bitmap Font
     {
@@ -189,7 +197,7 @@ window.onload = () => {
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
-            render(gl, canvas, timeUniform, resolutionUniform);
+            render(gl, canvas, program);
         };
     }
 
@@ -231,8 +239,8 @@ window.onload = () => {
         const dt = (timestamp - start) * 0.001;
         start = timestamp;
 
-        gl.uniform1f(timeUniform, start * 0.001);
-        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+        gl.uniform1f(program.timeUniform, start * 0.001);
+        gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
 
         gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
 
