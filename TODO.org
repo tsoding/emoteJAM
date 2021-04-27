@@ -1,3 +1,5 @@
 - [X] Customize the emote image
 - [X] Render the emote button
-- [ ] More shader presets
+- [-] More shader presets
+  - [X] JAM
+  - [ ] Hop
