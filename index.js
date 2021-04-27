@@ -121,6 +121,48 @@ void main() {
     gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
 }
 `
+    },
+    "Hop": {
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    float scale = 0.25;
+    float x_freq = 0.5 * radians(180.0);
+    float y_freq = 6.0;
+
+    float a = 2.0 * floor(mod(floor(x_freq * time / 2.0), 2.0)) - 1.0;
+
+    vec2 offset = vec2(
+        (mod(x_freq * time, 2.0) - 1.0) * a,
+        abs(sin(y_freq * time)) * 0.5);
+    gl_Position = vec4(
+        meshPosition * scale + offset,
+        0.0,
+        1.0);
+    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
+}
+`,
+        "fragment": `#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+void main() {
+    gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
+}
+`
     }
 };
 
@@ -154,7 +196,7 @@ function render(gl, canvas, program) {
 
     let fps = 30;
     let dt = 1.0 / fps;
-    let duration = Math.PI / 3.0;
+    let duration = 4.0;//Math.PI / 3.0;
     let frameCount = 100;
 
     let t = 0.0;
@@ -205,6 +247,7 @@ window.onload = () => {
     for (let name in presets) {
         presetsSelect.add(new Option(name));
     }
+    presetsSelect.selectedIndex = 2;
 
     const vertexAttribs = {
         "meshPosition": 0
@@ -219,7 +262,7 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let program = loadPresetsProgram(gl, presets.clowning, vertexAttribs);
+    let program = loadPresetsProgram(gl, presets[presetsSelect.selectedOptions[0].value], vertexAttribs);
 
     presetsSelect.onchange = function() {
         gl.deleteProgram(program.id);
