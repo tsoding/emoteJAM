@@ -196,6 +196,11 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
 }
 
 window.onload = () => {
+    const presetsSelect = document.getElementById("presets");
+    for (let name in presets) {
+        presetsSelect.add(new Option(name));
+    }
+
     const vertexAttribs = {
         "meshPosition": 0
     };
@@ -210,6 +215,11 @@ window.onload = () => {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     let program = loadPresetsProgram(gl, presets.clowning, vertexAttribs);
+
+    presetsSelect.onchange = function() {
+        gl.deleteProgram(program.id);
+        program = loadPresetsProgram(gl, presets[this.selectedOptions[0].value], vertexAttribs)
+    };
 
     // Bitmap Font
     {
