@@ -40,7 +40,9 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
     return program;
 }
 
-vertexShaderSource = `#version 100
+const presets = {
+    "clowning": {
+        "vertex": `#version 100
 
 precision mediump float;
 
@@ -61,9 +63,8 @@ void main() {
         1.0);
     uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
 }
-`;
-
-fragmentShaderSource = `#version 100
+`,
+        "fragment": `#version 100
 
 precision mediump float;
 
@@ -83,7 +84,45 @@ void main() {
         1.0);
     gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
 }
-`;
+`
+    },
+    "JAM": {
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    float a = 0.3;
+    float t = (sin(24.0 * time) * a + a) / 2.0;
+
+    gl_Position = vec4(
+        meshPosition + vec2(0.0, t),
+        0.0,
+        1.0);
+    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
+}
+`,
+        "fragment": `#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+void main() {
+    gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
+}
+`
+    }
+};
 
 function createTextureFromImage(gl, image) {
     let textureId = gl.createTexture();
@@ -105,7 +144,7 @@ function createTextureFromImage(gl, image) {
     return textureId;
 }
 
-function render(gl, canvas, timeUniform, resolutionUniform) {
+function render(gl, canvas, program) {
     var gif = new GIF({
         workers: 5,
         quality: 10,
@@ -120,8 +159,8 @@ function render(gl, canvas, timeUniform, resolutionUniform) {
 
     let t = 0.0;
     while (t <= duration) {
-        gl.uniform1f(timeUniform, t);
-        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+        gl.uniform1f(program.timeUniform, t);
+        gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
@@ -147,8 +186,27 @@ function render(gl, canvas, timeUniform, resolutionUniform) {
     gif.render();
 }
 
+function loadPresetsProgram(gl, preset, vertexAttribs) {
+    let vertexShader = compileShaderSource(gl, preset.vertex, gl.VERTEX_SHADER);
+    let fragmentShader = compileShaderSource(gl, preset.fragment, gl.FRAGMENT_SHADER);
+    let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    gl.useProgram(id);
+    return {
+        "id": id,
+        "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
+        "timeUniform": gl.getUniformLocation(id, 'time'),
+    };
+}
+
 window.onload = () => {
-    let vertexAttribs = {
+    const presetsSelect = document.getElementById("presets");
+    for (let name in presets) {
+        presetsSelect.add(new Option(name));
+    }
+
+    const vertexAttribs = {
         "meshPosition": 0
     };
 
@@ -161,13 +219,12 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let vertexShader = compileShaderSource(gl, vertexShaderSource, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
-    let program = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
-    gl.useProgram(program);
+    let program = loadPresetsProgram(gl, presets.clowning, vertexAttribs);
 
-    let resolutionUniform = gl.getUniformLocation(program, 'resolution');
-    let timeUniform = gl.getUniformLocation(program, 'time');
+    presetsSelect.onchange = function() {
+        gl.deleteProgram(program.id);
+        program = loadPresetsProgram(gl, presets[this.selectedOptions[0].value], vertexAttribs)
+    };
 
     // Bitmap Font
     {
@@ -186,7 +243,7 @@ window.onload = () => {
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
-            render(gl, canvas, timeUniform, resolutionUniform);
+            render(gl, canvas, program);
         };
     }
 
@@ -228,8 +285,8 @@ window.onload = () => {
         const dt = (timestamp - start) * 0.001;
         start = timestamp;
 
-        gl.uniform1f(timeUniform, start * 0.001);
-        gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+        gl.uniform1f(program.timeUniform, start * 0.001);
+        gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
 
         gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
 
