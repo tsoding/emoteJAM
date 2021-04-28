@@ -1,0 +1,41 @@
+- [ ] Alpha
+  - [ ] More usable UI layout (does not have to be pretty)
+  - [ ] Preview window is upside down (the actual problem is
+    gl.readPixel returns upside down image (because thank you OpenGL
+    coordinate system) so we render upside down)
+  - [ ] GIF rendering progress is not reported
+  - [ ] "Render" button opens a new tab instead of downloading the emote
+    - But that allows you to "preview" the rendered version
+      - Embed the rendered version into the DOM of the current page
+        and let the user save it if they are happy with it
+  - [ ] Rendered GIF has no transparency
+  - [ ] Customize parameters of the GIF rendering
+    - [ ] FPS
+    - [ ] Quality
+    - ...
+  - [ ] Presets
+    - [ ] JAM
+      - [ ] Perfectly looped timing
+      - [ ] The headphones and the hand
+    - [ ] Hop
+      - [ ] Perfectly looped timing
+      - [ ] No bumping on the edges
+      - [ ] Flipping the texture according to the direction
+- [ ] Beta
+- [ ] Back-burner
+  - [ ] Fork and rewrite gif.js in WebAssembly
+    - Also get rid of the old coffee stuff
+  - [ ] "Render & Upload to BTTV" button (should just automatically
+    upload the newly generated emote on your BTTV account)
+  - [ ] Download existing emotes from BTTV, FFZ and Twitch
+    - In case of Twitch you can download them simply by their name
+      cause it's unique (afaik) across the whole platform
+  - [ ] Drag and drop image files
+  - [ ] Custom shaders
+    - Some random ideas
+      - Store shaders in local storage
+      - Store shaders in something gist
+      - Export/import presets as a JSON file
+  - [ ] Preset parameters
+    - This is more for people who don't know shaders. Presets may have
+      special custom parameters that can be modified with UI elements.
