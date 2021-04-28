@@ -1,15 +1,35 @@
 <html>
   <head>
     <title>Gif.js Probe</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="main.css">
   </head>
   <body>
-    <div><input id="custom-file" type="file" /></div>
-    <img id="custom-preview" src="tsodinClown.png" style="display: none;" />
-    <canvas id="preview" width="112" height="112"></canvas>
-    <div>
-      Presets: <select id="presets"></select>
+    <h1>emoteJAM</h1>
+
+    <h2>Upload an Image</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+
+    <div class="widget">
+      <img class="widget-element" id="custom-preview" src="tsodinClown.png" />
+      <div class="widget-element"><input id="custom-file" type="file" /></div>
     </div>
-    <div><input id="render" type="submit" value="Render" /></div>
+
+    <h2>Select a Filter</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+
+    <div class="widget">
+      <div class="widget-element">
+        Presets: <select id="presets"></select>
+      </div>
+      <canvas id="preview" width="112" height="112" class="widget-element"></canvas>
+    </div>
+
+    <h2>Render</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+    <div class="widget">
+      <div class="widget-element"><input id="render" type="submit" value="Render" /></div>
+    </div>
     <script src="./gif.js"></script>
     <script src="./index.js"></script>
   </body>

@@ -1,0 +1,31 @@
+body {
+    margin: 40px auto;
+    max-width: 650px;
+    line-height: 1.6;
+    font-size:18px; 
+    color:#444;
+    padding: 0 10px
+}
+
+h1 {
+    font-size: 400%;
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 200%;
+    line-height: 1.2;
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+.widget {
+    width: 100%;
+    padding-top: 10px;
+}
+
+.widget-element {
+    display: table;
+    margin: 0 auto;
+    padding-top: 10px;
+}

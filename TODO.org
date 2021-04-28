@@ -1,5 +1,4 @@
 - [ ] Alpha
-  - [ ] More usable UI layout (does not have to be pretty)
   - [ ] Preview window is upside down (the actual problem is
     gl.readPixel returns upside down image (because thank you OpenGL
     coordinate system) so we render upside down)
@@ -21,6 +20,10 @@
       - [ ] Perfectly looped timing
       - [ ] No bumping on the edges
       - [ ] Flipping the texture according to the direction
+  - [ ] More usable UI layout (does not have to be pretty)
+    - [ ] Replace the Lorem with actually useful texts
+    - [ ] Add copyright footer
+    - [ ] Dark Theme
 - [ ] Beta
 - [ ] Back-burner
   - [ ] Fork and rewrite gif.js in WebAssembly
