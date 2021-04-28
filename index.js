@@ -205,6 +205,7 @@ function render(gl, canvas, program) {
 
         let pixels = new Uint8ClampedArray(4 * canvas.width * canvas.height);
         gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        // Flip the image vertically
         {
             const center = Math.floor(canvas.height / 2);
             for (let y = 0; y < center; ++y) {

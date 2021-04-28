@@ -1,17 +1,13 @@
-- [-] Alpha
+- [ ] Alpha
   - [ ] Smooth progress report on the first phase of the emote
     rendering (the OpenGL one)
-  - [X] Preview window is upside down (the actual problem is
-    gl.readPixel returns upside down image (because thank you OpenGL
-    coordinate system) so we render upside down)
-  - [X] "Render" button opens a new tab instead of downloading the emote
-    - But that allows you to "preview" the rendered version
-      - Embed the rendered version into the DOM of the current page
-        and let the user save it if they are happy with it
+  - [ ] When you upload big image it takes up a lot of space on the screen
+  - [ ] Click Several "Render" clicks
   - [ ] Rendered GIF has no transparency
   - [ ] Customize parameters of the GIF rendering
     - [ ] FPS
     - [ ] Quality
+    - [ ] Resolution
     - ...
   - [ ] Presets
     - [ ] JAM
@@ -26,6 +22,7 @@
     - [ ] Add copyright footer
     - [ ] Dark Theme
 - [ ] Beta
+  - [ ] Timing of the animation is screwed on blur event
 - [ ] Back-burner
   - [ ] Fork and rewrite gif.js in WebAssembly
     - Also get rid of the old coffee stuff
