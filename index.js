@@ -188,10 +188,12 @@ function render(gl, canvas, program) {
         height: canvas.height,
     });
 
-    let fps = 30;
-    let dt = 1.0 / fps;
-    let duration = Math.PI / 3.0;
-    let frameCount = 100;
+    const fps = 30;
+    const dt = 1.0 / fps;
+    const duration = Math.PI / 3.0;
+    const frameCount = 100;
+
+    const renderProgress = document.getElementById("render-progress");
 
     let t = 0.0;
     while (t <= duration) {
@@ -218,11 +220,13 @@ function render(gl, canvas, program) {
             }
         }
 
-        console.log(canvas.width);
         gif.addFrame(new ImageData(pixels, canvas.width, canvas.height), {
             delay: dt * 1000,
             dispose: 2,
         });
+
+        renderProgress.style.width = `${(t / duration) * 50}%`;
+
         t += dt;
     }
 
@@ -232,7 +236,7 @@ function render(gl, canvas, program) {
     });
 
     gif.on('progress', (p) => {
-        console.log(`progress ${p}`);
+        renderProgress.style.width = `${50 + p * 50}%`;
     });
 
     gif.render();

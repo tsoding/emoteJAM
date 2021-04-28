@@ -29,3 +29,13 @@ h2 {
     margin: 0 auto;
     padding-top: 10px;
 }
+
+.progress-bar {
+    width: 100%;
+}
+
+.progress {
+    width: 0%;
+    height: 20px;
+    background: #07a;
+}

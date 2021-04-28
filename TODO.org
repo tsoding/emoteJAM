@@ -1,5 +1,6 @@
 - [-] Alpha
-  - [ ] GIF rendering progress is not reported
+  - [ ] Smooth progress report on the first phase of the emote
+    rendering (the OpenGL one)
   - [X] Preview window is upside down (the actual problem is
     gl.readPixel returns upside down image (because thank you OpenGL
     coordinate system) so we render upside down)
