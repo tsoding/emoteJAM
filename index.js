@@ -196,7 +196,7 @@ function render(gl, canvas, program) {
 
     let fps = 30;
     let dt = 1.0 / fps;
-    let duration = 4.0;//Math.PI / 3.0;
+    let duration = Math.PI / 3.0;
     let frameCount = 100;
 
     let t = 0.0;
@@ -218,7 +218,8 @@ function render(gl, canvas, program) {
     }
 
     gif.on('finished', (blob) => {
-        window.open(URL.createObjectURL(blob));
+        const renderPreview = document.getElementById("render-preview");
+        renderPreview.src = URL.createObjectURL(blob);
     });
 
     gif.on('progress', (p) => {

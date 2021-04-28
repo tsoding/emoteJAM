@@ -1,9 +1,9 @@
-- [ ] Alpha
+- [-] Alpha
   - [ ] Preview window is upside down (the actual problem is
     gl.readPixel returns upside down image (because thank you OpenGL
     coordinate system) so we render upside down)
   - [ ] GIF rendering progress is not reported
-  - [ ] "Render" button opens a new tab instead of downloading the emote
+  - [X] "Render" button opens a new tab instead of downloading the emote
     - But that allows you to "preview" the rendered version
       - Embed the rendered version into the DOM of the current page
         and let the user save it if they are happy with it
