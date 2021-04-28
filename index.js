@@ -56,7 +56,7 @@ varying vec2 uv;
 void main() {
     float stretch = sin(6.0 * time) * 0.5 + 1.0;
 
-    vec2 offset = vec2(0.0, stretch - 1.0);
+    vec2 offset = vec2(0.0, 1.0 - stretch);
     gl_Position = vec4(
         meshPosition * vec2(stretch, 2.0 - stretch) + offset,
         0.0,
@@ -76,13 +76,7 @@ uniform sampler2D emote;
 varying vec2 uv;
 
 void main() {
-    vec2 coord = gl_FragCoord.xy / resolution;
-    vec4 KappaPride = vec4(
-        (sin(coord.x + time) + 1.0) / 2.0,
-        (cos(coord.y + time) + 1.0) / 2.0,
-        (sin(coord.x + coord.y + time) + 1.0) / 2.0,
-        1.0);
-    gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
+    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
 }
 `
     },
@@ -100,7 +94,7 @@ void main() {
     float t = (sin(24.0 * time) * a + a) / 2.0;
 
     gl_Position = vec4(
-        meshPosition + vec2(0.0, t),
+        meshPosition - vec2(0.0, t),
         0.0,
         1.0);
     uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
@@ -118,7 +112,7 @@ uniform sampler2D emote;
 varying vec2 uv;
 
 void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
+    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
 }
 `
     },
@@ -134,13 +128,13 @@ varying vec2 uv;
 void main() {
     float scale = 0.25;
     float x_freq = 0.5 * radians(180.0);
-    float y_freq = 6.0;
+    float y_freq = 7.0;
 
     float a = 2.0 * floor(mod(floor(x_freq * time / 2.0), 2.0)) - 1.0;
 
     vec2 offset = vec2(
         (mod(x_freq * time, 2.0) - 1.0) * a,
-        abs(sin(y_freq * time)) * 0.5);
+        abs(sin(y_freq * time)) * -0.5);
     gl_Position = vec4(
         meshPosition * scale + offset,
         0.0,
@@ -160,7 +154,7 @@ uniform sampler2D emote;
 varying vec2 uv;
 
 void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, uv.y));
+    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
 }
 `
     }
@@ -209,6 +203,21 @@ function render(gl, canvas, program) {
 
         let pixels = new Uint8ClampedArray(4 * canvas.width * canvas.height);
         gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        {
+            const center = Math.floor(canvas.height / 2);
+            for (let y = 0; y < center; ++y) {
+                const row = 4 * canvas.width;
+                for (let x = 0; x < row; ++x) {
+                    const ai = y * 4 * canvas.width + x;
+                    const bi = (canvas.height - y - 1) * 4 * canvas.width + x;
+                    const a = pixels[ai];
+                    const b = pixels[bi];
+                    pixels[ai] = b;
+                    pixels[bi] = a;
+                }
+            }
+        }
+
         console.log(canvas.width);
         gif.addFrame(new ImageData(pixels, canvas.width, canvas.height), {
             delay: dt * 1000,
@@ -248,7 +257,6 @@ window.onload = () => {
     for (let name in presets) {
         presetsSelect.add(new Option(name));
     }
-    presetsSelect.selectedIndex = 2;
 
     const vertexAttribs = {
         "meshPosition": 0
