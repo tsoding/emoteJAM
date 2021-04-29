@@ -22,6 +22,7 @@
     - [ ] Replace the Lorem with actually useful texts
     - [ ] Add copyright footer
     - [ ] Dark Theme
+    - [ ] Favicon
 - [ ] Beta
   - [ ] Timing of the animation is screwed on blur event
 - [ ] Back-burner
