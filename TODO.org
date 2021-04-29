@@ -4,11 +4,14 @@
   - [ ] Replace rendering preview with spining wheel on rendering
   - [ ] When you upload big image it takes up a lot of space on the screen
   - [ ] Make Several "Render" clicks
-  - [ ] Rendered GIF has no transparency
+  - [X] Rendered GIF has no transparency
+  - [ ] Special built-in "clean up" filters that are always applied before handing the texture to the preset shaders
+    - Like the one we did to remove weird pixels from Jebaited
   - [ ] Customize parameters of the GIF rendering
     - [ ] FPS
     - [ ] Quality
     - [ ] Resolution
+    - [ ] Custom transparency color
     - ...
   - [-] Presets
     - [-] JAM
@@ -45,3 +48,4 @@
   - [ ] Preset parameters
     - This is more for people who don't know shaders. Presets may have
       special custom parameters that can be modified with UI elements.
+  - [ ] Ability to pause the animation

@@ -78,6 +78,7 @@ varying vec2 uv;
 
 void main() {
     gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
 }
 `
     },
@@ -115,6 +116,7 @@ varying vec2 uv;
 
 void main() {
     gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
 }
 `
     },
@@ -169,6 +171,7 @@ varying vec2 uv;
 
 void main() {
     gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
 }
 `
     }
@@ -200,6 +203,7 @@ function render(gl, canvas, program) {
         quality: 10,
         width: canvas.width,
         height: canvas.height,
+        transparent: 0x00FF00,
     });
 
     const fps = 30;
@@ -213,7 +217,7 @@ function render(gl, canvas, program) {
     while (t <= duration) {
         gl.uniform1f(program.timeUniform, t);
         gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
-        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clearColor(0.0, 1.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
 
