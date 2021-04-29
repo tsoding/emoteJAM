@@ -1,8 +1,6 @@
 - [ ] Alpha
-  - [ ] Get rid of the "Render" buttons
-    - Just rerender every time something changes
-      - With WebAssembly sped up gif.js this will be especially nice
   - [ ] Prevent several concurrent render processess
+    - Use Promises or something like that
   - [ ] Give "clowning" filter a better name
   - [ ] Presets
     - [ ] Hop
@@ -12,14 +10,20 @@
       - https://betterttv.com/emotes/5c85dd4b2bc49a0419824494
       - Just animate UV
   - [ ] More usable UI layout (does not have to be pretty)
+    - [ ] Logo
+      - Use the Logo as the test image (instead of tsodinClown) and as the favicon
     - [ ] Replace the Lorem with actually useful texts
     - [ ] Add copyright footer
-    - [ ] Dark Theme
     - [ ] Favicon
     - [ ] Widget elements are too small
   - [ ] Smooth progress report on the first phase of the emote
     rendering (the OpenGL one)
+  - [ ] Get rid of the "Render" buttons
+    - Just rerender every time something changes
+      - With WebAssembly sped up gif.js this will be especially nice
+  - [ ] "Download" button
 - [ ] Beta
+  - [ ] Dark Theme
   - [ ] Timing of the animation is screwed on blur event
   - [ ] Customize parameters of the GIF rendering
     - [ ] FPS
