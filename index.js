@@ -42,6 +42,7 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
 
 const presets = {
     "clowning": {
+        "duration": Math.PI / 3,
         "vertex": `#version 100
 
 precision mediump float;
@@ -81,6 +82,7 @@ void main() {
 `
     },
     "JAM": {
+        "duration": Math.PI / 3,
         "vertex": `#version 100
 precision mediump float;
 
@@ -117,6 +119,7 @@ void main() {
 `
     },
     "Hop": {
+        "duration": 0.1,
         "vertex": `#version 100
 precision mediump float;
 
@@ -190,7 +193,7 @@ function render(gl, canvas, program) {
 
     const fps = 30;
     const dt = 1.0 / fps;
-    const duration = Math.PI / 3.0;
+    const duration = program.duration;
     const frameCount = 100;
 
     const renderProgress = document.getElementById("render-progress");
@@ -254,6 +257,7 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
         "id": id,
         "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
         "timeUniform": gl.getUniformLocation(id, 'time'),
+        "duration": preset.duration,
     };
 }
 
