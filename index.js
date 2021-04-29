@@ -212,6 +212,11 @@ function render(gl, canvas, program) {
     const frameCount = 100;
 
     const renderProgress = document.getElementById("render-progress");
+    const renderSpinner = document.getElementById("render-spinner");
+    const renderPreview = document.getElementById("render-preview");
+
+    renderPreview.style.display = "none";
+    renderSpinner.style.display = "block";
 
     let t = 0.0;
     while (t <= duration) {
@@ -250,8 +255,9 @@ function render(gl, canvas, program) {
     }
 
     gif.on('finished', (blob) => {
-        const renderPreview = document.getElementById("render-preview");
         renderPreview.src = URL.createObjectURL(blob);
+        renderPreview.style.display = "block";
+        renderSpinner.style.display = "none";
     });
 
     gif.on('progress', (p) => {

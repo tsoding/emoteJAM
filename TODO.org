@@ -1,5 +1,5 @@
 - [-] Alpha
-  - [ ] Replace rendering preview with spining wheel on rendering
+  - [X] Replace rendering preview with spining wheel on rendering
   - [ ] When you upload big image it takes up a lot of space on the screen
   - [ ] Original aspect ratio of the input image is not preserved
     - I guess it should be solved on the level of the "filters"

@@ -11,8 +11,8 @@
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
 
     <div class="widget">
-      <img class="widget-element" id="custom-preview" src="tsodinClown.png" />
       <div class="widget-element"><input id="custom-file" type="file" /></div>
+      <img class="widget-element" id="custom-preview" src="tsodinClown.png" />
     </div>
 
     <h2>Select a Filter</h2>
@@ -28,12 +28,12 @@
     <h2>Render</h2>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
     <div class="widget">
-      <div class="widget-element progress-bar">
-        <div class="progress" id="render-progress">
-        </div>
+      <div class="widget-element progress-bar"><div class="progress" id="render-progress"></div></div>
+      <div class="widget-element"><input id="render" type="submit" value="Render" /></div>
+      <div class="widget-element">
+        <div id="render-spinner" class="spinning-wheel" style="display: none"></div>
       </div>
       <img id="render-preview" class="widget-element" />
-      <div class="widget-element"><input id="render" type="submit" value="Render" /></div>
     </div>
     <script src="./gif.js"></script>
     <script src="./index.js"></script>

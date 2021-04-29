@@ -2,7 +2,7 @@ body {
     margin: 40px auto;
     max-width: 650px;
     line-height: 1.6;
-    font-size:18px; 
+    font-size:18px;
     color:#444;
     padding: 0 10px
 }
@@ -38,4 +38,25 @@ h2 {
     width: 0%;
     height: 20px;
     background: #07a;
+}
+
+.spinning-wheel {
+    width: 92px;
+    height: 92px;
+    border-left: 20px solid #07a;
+    border-right: 20px solid #00000000;
+    border-top: 20px solid #00000000;
+    border-bottom: 20px solid #00000000;
+    border-radius: 112px;
+    animation: spinning 0.5s infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes spinning {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
