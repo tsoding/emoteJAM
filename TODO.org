@@ -1,4 +1,4 @@
-- [ ] Alpha
+- [-] Alpha
   - [ ] Smooth progress report on the first phase of the emote
     rendering (the OpenGL one)
   - [ ] Replace rendering preview with spining wheel on rendering
@@ -10,9 +10,9 @@
     - [ ] Quality
     - [ ] Resolution
     - ...
-  - [ ] Presets
-    - [ ] JAM
-      - [ ] Perfectly looped timing
+  - [-] Presets
+    - [-] JAM
+      - [X] Perfectly looped timing
       - [ ] The headphones and the hand
     - [ ] Hop
       - [ ] Perfectly looped timing

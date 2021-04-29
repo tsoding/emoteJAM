@@ -82,7 +82,7 @@ void main() {
 `
     },
     "JAM": {
-        "duration": Math.PI / 3,
+        "duration": Math.PI / 12.0,
         "vertex": `#version 100
 precision mediump float;
 
