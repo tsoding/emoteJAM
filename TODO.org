@@ -3,7 +3,7 @@
     rendering (the OpenGL one)
   - [ ] Replace rendering preview with spining wheel on rendering
   - [ ] When you upload big image it takes up a lot of space on the screen
-  - [ ] Click Several "Render" clicks
+  - [ ] Make Several "Render" clicks
   - [ ] Rendered GIF has no transparency
   - [ ] Customize parameters of the GIF rendering
     - [ ] FPS
