@@ -1,14 +1,18 @@
 - [ ] Alpha
   - [ ] Prevent several concurrent render processess
     - Use Promises or something like that
-  - [ ] Give "clowning" filter a better name
   - [ ] Presets
     - [ ] Hop
       - [ ] Customizable flipping
-    - [ ] Bounce
     - [ ] Pepego
       - https://betterttv.com/emotes/5c85dd4b2bc49a0419824494
       - Just animate UV
+    - [ ] ppHopper
+    - [ ] ppOverheat
+    - [ ] ppBounce
+    - [ ] ppCircle
+    - [ ] ppSlide
+    - [ ] ppCorner
   - [ ] More usable UI layout (does not have to be pretty)
     - [ ] Logo
       - Use the Logo as the test image (instead of tsodinClown) and as the favicon
