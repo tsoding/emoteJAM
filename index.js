@@ -17,7 +17,7 @@ function compileShaderSource(gl, source, shaderType) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error(`Could not compile ${this.shaderTypeToString(shaderType)} shader: ${gl.getShaderInfoLog(shader)}`);
+        throw new Error(`Could not compile ${shaderTypeToString(shaderType)} shader: ${gl.getShaderInfoLog(shader)}`);
     }
     return shader;
 }
