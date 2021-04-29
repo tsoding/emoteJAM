@@ -60,3 +60,7 @@ h2 {
         transform: rotate(360deg);
     }
 }
+
+#custom-preview {
+    width: 112px;
+}

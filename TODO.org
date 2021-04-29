@@ -2,9 +2,11 @@
   - [X] Replace rendering preview with spining wheel on rendering
   - [ ] Get rid of the "Render" buttons
     - Just rerender every time something changes
-      - With WebAssembly speed it this will be especially nice
-  - [ ] When you upload big image it takes up a lot of space on the screen
+      - With WebAssembly sped up gif.js this will be especially nice
+  - [X] When you upload big image it takes up a lot of space on the screen
   - [ ] Prevent several concurrent render processess
+  - [ ] Rename JAM to Laughing
+    - JAM is actually infeasiable rn
   - [X] Rendered GIF has no transparency
   - [-] Presets
     - [-] JAM
@@ -17,6 +19,9 @@
       - [ ] Going out of bounds of edges
       - [ ] Customizable flipping
     - [ ] Bounce
+    - [ ] Pepego
+      - https://betterttv.com/emotes/5c85dd4b2bc49a0419824494
+      - Just animate UV
   - [ ] More usable UI layout (does not have to be pretty)
     - [ ] Replace the Lorem with actually useful texts
     - [ ] Add copyright footer
