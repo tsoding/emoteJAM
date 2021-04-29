@@ -1,9 +1,9 @@
 - [-] Alpha
-  - [ ] Smooth progress report on the first phase of the emote
-    rendering (the OpenGL one)
   - [ ] Replace rendering preview with spining wheel on rendering
   - [ ] When you upload big image it takes up a lot of space on the screen
   - [ ] Original aspect ratio of the input image is not preserved
+    - I guess it should be solved on the level of the "filters"
+      - So we need to pass the size of the textures to the filters as uniforms
   - [ ] Make Several "Render" clicks
   - [X] Rendered GIF has no transparency
   - [ ] Special built-in "clean up" filters that are always applied before handing the texture to the preset shaders
@@ -30,6 +30,9 @@
     - [ ] Add copyright footer
     - [ ] Dark Theme
     - [ ] Favicon
+    - [ ] Widget elements are too small
+  - [ ] Smooth progress report on the first phase of the emote
+    rendering (the OpenGL one)
 - [ ] Beta
   - [ ] Timing of the animation is screwed on blur event
 - [ ] Back-burner
