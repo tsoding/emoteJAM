@@ -119,7 +119,7 @@ void main() {
 `
     },
     "Hop": {
-        "duration": 0.1,
+        "duration": 0.85 * 2,
         "vertex": `#version 100
 precision mediump float;
 
@@ -128,16 +128,23 @@ uniform float time;
 
 varying vec2 uv;
 
+float sliding_from_left_to_right(float time_interval) {
+    return (mod(time, time_interval) - time_interval * 0.5) / (time_interval * 0.5);
+}
+
+float flipping_directions(float time_interval) {
+    return 1.0 - 2.0 * mod(floor(time / time_interval), 2.0);
+}
+
 void main() {
     float scale = 0.25;
-    float x_freq = 0.5 * radians(180.0);
-    float y_freq = 7.0;
-
-    float a = 2.0 * floor(mod(floor(x_freq * time / 2.0), 2.0)) - 1.0;
-
+    float hops = 2.0;
+    float x_time_interval = 0.85;
+    float y_time_interval = x_time_interval / (2.0 * hops);
     vec2 offset = vec2(
-        (mod(x_freq * time, 2.0) - 1.0) * a,
-        abs(sin(y_freq * time)) * -0.5);
+        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval),
+        ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0));
+
     gl_Position = vec4(
         meshPosition * scale + offset,
         0.0,
@@ -266,6 +273,7 @@ window.onload = () => {
     for (let name in presets) {
         presetsSelect.add(new Option(name));
     }
+    presetsSelect.selectedIndex = 2;
 
     const vertexAttribs = {
         "meshPosition": 0
@@ -348,6 +356,9 @@ window.onload = () => {
 
         gl.uniform1f(program.timeUniform, start * 0.001);
         gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
+
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
         gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
 
