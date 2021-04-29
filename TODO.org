@@ -5,13 +5,11 @@
       - With WebAssembly sped up gif.js this will be especially nice
   - [X] When you upload big image it takes up a lot of space on the screen
   - [ ] Prevent several concurrent render processess
-  - [ ] Rename JAM to Laughing
+  - [X] Rename JAM to Laughing
     - JAM is actually infeasiable rn
+  - [ ] Give "clowning" filter a better name
   - [X] Rendered GIF has no transparency
   - [-] Presets
-    - [-] JAM
-      - [X] Perfectly looped timing
-      - [ ] The headphones and the hand
     - [-] Hop
       - [X] Perfectly looped timing
       - [X] No bumping on the edges

@@ -41,7 +41,7 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
 }
 
 const presets = {
-    "clowning": {
+    "Clowning": {
         "duration": Math.PI / 3,
         "vertex": `#version 100
 
@@ -82,7 +82,7 @@ void main() {
 }
 `
     },
-    "JAM": {
+    "Laughing": {
         "duration": Math.PI / 12.0,
         "vertex": `#version 100
 precision mediump float;
@@ -287,7 +287,6 @@ window.onload = () => {
     for (let name in presets) {
         presetsSelect.add(new Option(name));
     }
-    presetsSelect.selectedIndex = 2;
 
     const vertexAttribs = {
         "meshPosition": 0
