@@ -59,3 +59,7 @@
     - This is more for people who don't know shaders. Presets may have
       special custom parameters that can be modified with UI elements.
   - [ ] Ability to pause the animation
+  - [ ] Support for GIFs as an input
+    - I think you can access individual frames of the GIF image. We
+      may try to turn each of them into a GL texture and animate
+      properly in the WebGL view
