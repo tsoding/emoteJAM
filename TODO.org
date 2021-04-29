@@ -17,8 +17,9 @@
     - [-] Hop
       - [X] Perfectly looped timing
       - [X] No bumping on the edges
-      - [ ] Flipping the texture according to the direction
+      - [X] Flipping the texture according to the direction
       - [ ] Going out of bounds of edges
+      - [ ] Customizable flipping
     - [ ] Bounce
   - [ ] More usable UI layout (does not have to be pretty)
     - [ ] Replace the Lorem with actually useful texts
