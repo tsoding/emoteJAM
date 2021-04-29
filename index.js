@@ -145,7 +145,7 @@ void main() {
     float y_time_interval = x_time_interval / (2.0 * hops);
     float height = 0.5;
     vec2 offset = vec2(
-        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval),
+        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval) * (1.0 - scale),
         ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
 
     gl_Position = vec4(

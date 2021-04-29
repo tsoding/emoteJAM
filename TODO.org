@@ -1,20 +1,11 @@
-- [-] Alpha
-  - [X] Replace rendering preview with spining wheel on rendering
+- [ ] Alpha
   - [ ] Get rid of the "Render" buttons
     - Just rerender every time something changes
       - With WebAssembly sped up gif.js this will be especially nice
-  - [X] When you upload big image it takes up a lot of space on the screen
   - [ ] Prevent several concurrent render processess
-  - [X] Rename JAM to Laughing
-    - JAM is actually infeasiable rn
   - [ ] Give "clowning" filter a better name
-  - [X] Rendered GIF has no transparency
-  - [-] Presets
-    - [-] Hop
-      - [X] Perfectly looped timing
-      - [X] No bumping on the edges
-      - [X] Flipping the texture according to the direction
-      - [ ] Going out of bounds of edges
+  - [ ] Presets
+    - [ ] Hop
       - [ ] Customizable flipping
     - [ ] Bounce
     - [ ] Pepego
