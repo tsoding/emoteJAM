@@ -3,6 +3,7 @@
     rendering (the OpenGL one)
   - [ ] Replace rendering preview with spining wheel on rendering
   - [ ] When you upload big image it takes up a lot of space on the screen
+  - [ ] Original aspect ratio of the input image is not preserved
   - [ ] Make Several "Render" clicks
   - [X] Rendered GIF has no transparency
   - [ ] Special built-in "clean up" filters that are always applied before handing the texture to the preset shaders
