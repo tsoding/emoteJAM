@@ -1,7 +1,7 @@
 - [-] Alpha
   - [-] Presets
-    - [ ] ppHopper
-    - [ ] ppOverheat
+    - [X] ppHopper
+    - [X] ppOverheat
     - [ ] ppBounce
     - [ ] ppCircle
     - [ ] ppSlide
