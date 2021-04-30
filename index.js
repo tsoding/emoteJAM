@@ -207,7 +207,7 @@ void main() {
 `
     },
     "Bounce": {
-        "duration": 1,
+        "duration": Math.PI / 5.0,
         "vertex": `#version 100
 precision mediump float;
 
