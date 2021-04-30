@@ -1,12 +1,5 @@
 - [-] Alpha
-  - [X] Prevent several concurrent render processess
-    - [X] Cancel the previous process before starting a new one
-  - [ ] Presets
-    - [ ] Hop
-      - [ ] Customizable flipping
-    - [ ] Pepego
-      - https://betterttv.com/emotes/5c85dd4b2bc49a0419824494
-      - Just animate UV
+  - [-] Presets
     - [ ] ppHopper
     - [ ] ppOverheat
     - [ ] ppBounce
@@ -37,6 +30,8 @@
     - ...
   - [ ] Special built-in "clean up" filters that are always applied before handing the texture to the preset shaders
     - Like the one we did to remove weird pixels from Jebaited
+    - Flipping the image (horizontally/vertically)
+    - Changing the tint
   - [ ] Original aspect ratio of the input image is not preserved
     - I guess it should be solved on the level of the "filters"
       - So we need to pass the size of the textures to the filters as uniforms

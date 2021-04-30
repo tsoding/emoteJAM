@@ -175,6 +175,131 @@ void main() {
 }
 `
     },
+    "Go": {
+        "duration": 1 / 4,
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+
+uniform vec2 resolution;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    gl_Position = vec4(meshPosition, 0.0, 1.0);
+    uv = (meshPosition + 1.0) / 2.0;
+}
+`,
+        "fragment": `
+#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+float slide(float speed, float value) {
+    return mod(value - speed * time, 1.0);
+}
+
+void main() {
+    float speed = 4.0;
+    gl_FragColor = texture2D(emote, vec2(slide(speed, uv.x), 1.0 - uv.y));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
+}
+`,
+    },
+    "Elevator": {
+        "duration": 1 / 4,
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+
+uniform vec2 resolution;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    gl_Position = vec4(meshPosition, 0.0, 1.0);
+    uv = (meshPosition + 1.0) / 2.0;
+}
+`,
+        "fragment": `
+#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+float slide(float speed, float value) {
+    return mod(value - speed * time, 1.0);
+}
+
+void main() {
+    float speed = 4.0;
+    gl_FragColor = texture2D(
+        emote,
+        vec2(uv.x, slide(speed, 1.0 - uv.y)));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
+}
+`,
+    },
+    "Rain": {
+        "duration": 1,
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+
+uniform vec2 resolution;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    gl_Position = vec4(meshPosition, 0.0, 1.0);
+    uv = (meshPosition + 1.0) / 2.0;
+}
+`,
+        "fragment": `
+#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+float slide(float speed, float value) {
+    return mod(value - speed * time, 1.0);
+}
+
+void main() {
+    float speed = 1.0;
+    gl_FragColor = texture2D(
+        emote,
+        vec2(mod(4.0 * slide(speed, uv.x), 1.0),
+             mod(4.0 * slide(speed, 1.0 - uv.y), 1.0)));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
+}
+`,
+    }
 };
 
 function createTextureFromImage(gl, image) {
@@ -289,6 +414,7 @@ window.onload = () => {
     for (let name in presets) {
         presetsSelect.add(new Option(name));
     }
+    presetsSelect.selectedIndex = 3;
 
     const vertexAttribs = {
         "meshPosition": 0
