@@ -2,7 +2,7 @@
   - [-] Presets
     - [X] ppHopper
     - [X] ppOverheat
-    - [ ] ppBounce
+    - [X] ppBounce
     - [ ] ppCircle
     - [ ] ppSlide
     - [ ] ppCorner
