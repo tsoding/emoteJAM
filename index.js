@@ -265,6 +265,8 @@ function render(gl, canvas, program) {
     });
 
     gif.render();
+
+    return gif;
 }
 
 function loadPresetsProgram(gl, preset, vertexAttribs) {
@@ -305,8 +307,10 @@ window.onload = () => {
 
     presetsSelect.onchange = function() {
         gl.deleteProgram(program.id);
-        program = loadPresetsProgram(gl, presets[this.selectedOptions[0].value], vertexAttribs)
+        program = loadPresetsProgram(gl, presets[this.selectedOptions[0].value], vertexAttribs);
     };
+
+    let gif = undefined;
 
     // Bitmap Font
     {
@@ -325,7 +329,10 @@ window.onload = () => {
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
-            render(gl, canvas, program);
+            if (gif && gif.running) {
+                gif.abort();
+            }
+            gif = render(gl, canvas, program);
         };
     }
 

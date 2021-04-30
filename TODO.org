@@ -1,6 +1,6 @@
-- [ ] Alpha
-  - [ ] Prevent several concurrent render processess
-    - Use Promises or something like that
+- [-] Alpha
+  - [X] Prevent several concurrent render processess
+    - [X] Cancel the previous process before starting a new one
   - [ ] Presets
     - [ ] Hop
       - [ ] Customizable flipping
