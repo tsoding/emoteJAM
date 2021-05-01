@@ -1,17 +1,7 @@
-- [-] Release
-  - [ ] Add "Hard" Filter
-  - [X] Add support section
 - [ ] Beta
-  - [ ] "Download" button
-  - [ ] Widget elements are too small
   - [ ] Development Server Script
-  - [ ] Handle "uploading" incorrect image
-    - Nothing particularly bad happens when you upload incorrect image
-      it would just look a bit more polished if the website at least
-      tried to handle that case
   - [ ] Logo
     - Use the Logo as the test image (instead of tsodinClown) and as the favicon
-  - [ ] Dark Theme
   - [ ] Timing of the animation is screwed on blur event
   - [ ] Customize parameters of the GIF rendering
     - [ ] FPS
@@ -34,7 +24,6 @@
   - [ ] "Render & Upload to BTTV" button (should just automatically
     upload the newly generated emote on your BTTV account)
   - [ ] Download existing emotes from BTTV, FFZ and Twitch (by just name since it's unique for the whole platform)
-  - [ ] Drag and drop image files
   - [ ] Custom shaders
     - Some random ideas
       - Store shaders in local storage
