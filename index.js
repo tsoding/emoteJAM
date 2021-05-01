@@ -4,6 +4,35 @@ const VEC2_COUNT = 2;
 const VEC2_X = 0;
 const VEC2_Y = 1;
 
+const THEMES = {
+    'light':
+    {
+        'body':
+        {
+            'color': '#444',
+            'backgroundColor': '#fff'
+        }
+    },
+    'dark':
+    {
+        'body':
+        {
+            'color': '#e9e9e9',
+            'backgroundColor': '#161616'
+        }
+    }
+}
+
+function setTheme(theme_name) {
+    let theme = THEMES[theme_name];
+    document.body.style.color = theme.body.color;
+    document.body.style.backgroundColor = theme.body.backgroundColor;
+    window.githubCornerSVG.style.fill = theme.body.color;
+    window.githubCornerSVG.style.color = theme.body.backgroundColor;
+    window.theme = theme_name;
+    localStorage.setItem('theme', theme_name);
+}
+
 function shaderTypeToString(gl, shaderType) {
     switch (shaderType) {
     case gl.VERTEX_SHADER: return 'Vertex';
@@ -772,6 +801,25 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
 }
 
 window.onload = () => {
+    window.githubCornerSVG = document.getElementById("github-corner-svg");
+    window.theme = localStorage.getItem('theme');
+    window.theme != null ? setTheme(window.theme) : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : null;
+
+    const themeChanger = document.getElementById("theme-changer");
+    themeChanger.onclick = function () {
+        switch (window.theme) {
+            case 'light':
+                setTheme('dark');
+                break;
+            case 'dark':
+                setTheme('light');
+                break;
+            default:
+                setTheme('dark');
+                break;
+        }
+    }
+
     const presetsSelect = document.getElementById("presets");
     for (let name in presets) {
         presetsSelect.add(new Option(name));

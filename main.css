@@ -1,3 +1,7 @@
+* {
+    transition: color .5s;
+}
+
 body {
     margin: 40px auto;
     max-width: 650px;
@@ -67,4 +71,8 @@ p {
 
 #custom-preview {
     width: 112px;
+}
+
+#theme-changer {
+    cursor: pointer;
 }
