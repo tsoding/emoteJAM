@@ -610,6 +610,46 @@ void main() {
     gl_FragColor = pixel * rainbow;
 }
 `,
+    },
+    "Hard": {
+        "transparent": 0x00FF00,
+        "duration": 2.0 * Math.PI / 32.0,
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+
+uniform vec2 resolution;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    float zoom = 1.4;
+    float intensity = 32.0;
+    float amplitude = 1.0 / 8.0;
+    vec2 shaking = vec2(cos(intensity * time), sin(intensity * time)) * amplitude;
+    gl_Position = vec4(meshPosition * zoom + shaking, 0.0, 1.0);
+    uv = (meshPosition + 1.0) / 2.0;
+}
+`,
+        "fragment": `
+#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+void main() {
+    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
+}
+`,
     }
 };
 
