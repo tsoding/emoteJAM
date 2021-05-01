@@ -42,6 +42,7 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
 
 const presets = {
     "Hop": {
+        "transparent": 0x00FF00,
         "duration": 0.85 * 2,
         "vertex": `#version 100
 precision mediump float;
@@ -97,6 +98,7 @@ void main() {
 `
     },
     "Hopper": {
+        "transparent": 0x00FF00,
         "duration": 0.85,
         "vertex": `#version 100
 precision mediump float;
@@ -152,6 +154,7 @@ void main() {
 `
     },
     "Overheat": {
+        "transparent": 0x00FF00,
         "duration": 0.85 / 8.0 * 2.0,
         "vertex": `#version 100
 precision mediump float;
@@ -207,6 +210,7 @@ void main() {
 `
     },
     "Bounce": {
+        "transparent": 0x00FF00,
         "duration": Math.PI / 5.0,
         "vertex": `#version 100
 precision mediump float;
@@ -245,6 +249,7 @@ void main() {
 `,
     },
     "Circle": {
+        "transparent": 0x00FF00,
         "duration": Math.PI / 4.0,
         "vertex": `#version 100
 precision mediump float;
@@ -296,6 +301,7 @@ void main() {
 `,
     },
     "Slide": {
+        "transparent": 0x00FF00,
         "duration": 0.85 * 2,
         "vertex": `#version 100
 precision mediump float;
@@ -351,6 +357,7 @@ void main() {
 `
     },
     "Laughing": {
+        "transparent": 0x00FF00,
         "duration": Math.PI / 12.0,
         "vertex": `#version 100
 precision mediump float;
@@ -389,6 +396,7 @@ void main() {
 `
     },
     "Blob": {
+        "transparent": 0x00FF00,
         "duration": Math.PI / 3,
         "vertex": `#version 100
 
@@ -430,6 +438,7 @@ void main() {
 `
     },
     "Go": {
+        "transparent": 0x00FF00,
         "duration": 1 / 4,
         "vertex": `#version 100
 precision mediump float;
@@ -470,6 +479,7 @@ void main() {
 `,
     },
     "Elevator": {
+        "transparent": 0x00FF00,
         "duration": 1 / 4,
         "vertex": `#version 100
 precision mediump float;
@@ -512,6 +522,7 @@ void main() {
 `,
     },
     "Rain": {
+        "transparent": 0x00FF00,
         "duration": 1,
         "vertex": `#version 100
 precision mediump float;
@@ -554,6 +565,52 @@ void main() {
 }
 `,
     },
+    "Pride": {
+        "transparent": null,
+        "duration": 2.0,
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+
+uniform vec2 resolution;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    gl_Position = vec4(meshPosition, 0.0, 1.0);
+    uv = (meshPosition + 1.0) / 2.0;
+}
+`,
+        "fragment": `
+#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+varying vec2 uv;
+
+vec3 hsl2rgb(vec3 c) {
+    vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0);
+    return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
+}
+
+void main() {
+    float speed = 1.0;
+
+    vec4 pixel = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
+    pixel.w = floor(pixel.w + 0.5);
+    pixel = vec4(mix(vec3(1.0), pixel.xyz, pixel.w), 1.0);
+    vec4 rainbow = vec4(hsl2rgb(vec3((time - uv.x - uv.y) * 0.5, 1.0, 0.80)), 1.0);
+    gl_FragColor = pixel * rainbow;
+}
+`,
+    }
 };
 
 function createTextureFromImage(gl, image) {
@@ -582,7 +639,7 @@ function render(gl, canvas, program) {
         quality: 10,
         width: canvas.width,
         height: canvas.height,
-        transparent: 0x00FF00,
+        transparent: program.transparent,
     });
 
     const fps = 30;
@@ -660,6 +717,7 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
         "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
         "timeUniform": gl.getUniformLocation(id, 'time'),
         "duration": preset.duration,
+        "transparent": preset.transparent,
     };
 }
 

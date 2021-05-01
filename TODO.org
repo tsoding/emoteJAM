@@ -1,17 +1,15 @@
 - [-] Alpha
-  - [ ] More usable UI layout (does not have to be pretty)
-    - [ ] Logo
-      - Use the Logo as the test image (instead of tsodinClown) and as the favicon
-    - [ ] Replace the Lorem with actually useful texts
-    - [ ] Add copyright footer
-    - [ ] Favicon
-    - [ ] Widget elements are too small
-  - [ ] Smooth progress report on the first phase of the emote
-    rendering (the OpenGL one)
-  - [ ] Get rid of the "Render" buttons
-    - Just rerender every time something changes
-      - With WebAssembly sped up gif.js this will be especially nice
+  - [X] Pride Filter
+  - [X] No transparency for certain filters
+  - [ ] Development Server Script
+  - [ ] Logo
+    - Use the Logo as the test image (instead of tsodinClown) and as the favicon
+  - [ ] Replace the Lorem with actually useful texts
+  - [ ] Add copyright footer
+  - [ ] Widget elements are too small
   - [ ] "Download" button
+  - [ ] CONTRIBUTING.md
+  - [ ] Beta distros
 - [ ] Beta
   - [ ] Dark Theme
   - [ ] Timing of the animation is screwed on blur event
@@ -28,14 +26,16 @@
   - [ ] Original aspect ratio of the input image is not preserved
     - I guess it should be solved on the level of the "filters"
       - So we need to pass the size of the textures to the filters as uniforms
+  - [ ] More filters
+    - [ ] 3D cube filter
+    - [ ] Triggered Filter
+      - Just shaking furiosly
 - [ ] Back-burner
   - [ ] Fork and rewrite gif.js in WebAssembly
     - Also get rid of the old coffee stuff
   - [ ] "Render & Upload to BTTV" button (should just automatically
     upload the newly generated emote on your BTTV account)
-  - [ ] Download existing emotes from BTTV, FFZ and Twitch
-    - In case of Twitch you can download them simply by their name
-      cause it's unique (afaik) across the whole platform
+  - [ ] Download existing emotes from BTTV, FFZ and Twitch (by just name since it's unique for the whole platform)
   - [ ] Drag and drop image files
   - [ ] Custom shaders
     - Some random ideas
@@ -50,3 +50,8 @@
     - I think you can access individual frames of the GIF image. We
       may try to turn each of them into a GL texture and animate
       properly in the WebGL view
+  - [ ] Get rid of the "Render" buttons
+    - Just rerender every time something changes
+      - With WebAssembly sped up gif.js this will be especially nice
+  - [ ] Smooth progress report on the first phase of the emote
+    rendering (the OpenGL one)
