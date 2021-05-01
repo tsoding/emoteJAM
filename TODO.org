@@ -1,6 +1,5 @@
 - [-] Alpha
-  - [X] Pride Filter
-  - [X] No transparency for certain filters
+  - [ ] Handle "uploading" incorrect image
   - [ ] Development Server Script
   - [ ] Logo
     - Use the Logo as the test image (instead of tsodinClown) and as the favicon
