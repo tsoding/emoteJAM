@@ -7,26 +7,35 @@
   <body>
     <h1>emoteJAM</h1>
 
-    <h2>Upload an Image</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+    <p>Welcome to emoteJAM &mdash; a simple website that generates animated <a href="https://betterttv.com/">BTTV</a> emotes from static images. Let's get started!</p>
+
+    <h2>1. Select an Image</h2>
+
+    <p>112x112 static images are prefered but you can try to select any image and see what happens. This does not upload the image anywhere. emoteJAM works entirely in your browser without any server behind it.</p>
 
     <div class="widget">
       <div class="widget-element"><input id="custom-file" type="file" /></div>
       <img class="widget-element" id="custom-preview" src="tsodinClown.png" />
     </div>
 
-    <h2>Select a Filter</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+    <p>After you selected the image move on the next section to select a Filter!</p>
+
+    <h2>2. Select a Filter</h2>
+    <p>The image below is not a GIF yet. It's just a preview of how the filter looks like when applied to the image you've selected. Try different filters and pick the one you want.</p>
 
     <div class="widget">
       <div class="widget-element">
-        Presets: <select id="presets"></select>
+        Filter: <select id="presets"></select>
       </div>
       <canvas id="preview" width="112" height="112" class="widget-element"></canvas>
     </div>
 
-    <h2>Render</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+    <p>Bright green color is going to be transparent when the actual final GIF is rendered. There is no way to change that yet (but we are working on it). If your image contains that color I'm deeply sorry!</p>
+
+    <p>Let's render your GIF now.</p>
+
+    <h2>3. Render the GIF</h2>
+    <p>Click "Render" and when the rendering process is done you can just Right Click the final image and Save it as a GIF that you can then upload to <a href="https://betterttv.com/">BTTV</a>.</p>
     <div class="widget">
       <div class="widget-element progress-bar"><div class="progress" id="render-progress"></div></div>
       <div class="widget-element"><input id="render" type="submit" value="Render" /></div>
@@ -34,6 +43,8 @@
         <div id="render-spinner" class="spinning-wheel" style="display: none"></div>
       </div>
       <img id="render-preview" class="widget-element" />
+      <p>By clicking "Render" you confirm that you have all of the necessary permissions from the respective copyright holders to process this image. Since all of the image processing/generation is done on your machine emoteJAM developers disclaim all the responsibility for any copyright violations done using this website.</p>
+      <p>Feel free to scroll back and start over. Have fun!</p>
     </div>
     <script src="./gif.js"></script>
     <script src="./index.js"></script>
