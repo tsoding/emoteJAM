@@ -3,6 +3,6 @@
 ## Quick Start
 
 ```console
-$ python -m SimpleHTTPServer 69696
+$ python -m SimpleHTTPServer 6969
 $ iexplore.exe http://localhost:6969/
 ```
