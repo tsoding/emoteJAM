@@ -690,6 +690,7 @@ function render(gl, canvas, program) {
     const renderProgress = document.getElementById("render-progress");
     const renderSpinner = document.getElementById("render-spinner");
     const renderPreview = document.getElementById("render-preview");
+    const renderDownload = document.getElementById("render-download");
 
     renderPreview.style.display = "none";
     renderSpinner.style.display = "block";
@@ -733,7 +734,16 @@ function render(gl, canvas, program) {
     gif.on('finished', (blob) => {
         renderPreview.src = URL.createObjectURL(blob);
         renderPreview.style.display = "block";
+        renderDownload.href = renderPreview.src;
+        file = document.querySelector("#custom-file").files[0];
+        if (file) {
+            file = file.name.split('.');
+            file.pop();
+        }
+        renderDownload.download = file ? file.join('') : "result";
+        renderDownload.style.display = "block";
         renderSpinner.style.display = "none";
+
     });
 
     gif.on('progress', (p) => {
