@@ -787,6 +787,18 @@ window.onload = () => {
         throw new Error("Could not initialize WebGL context");
     }
 
+    const canvasWidthInput = document.getElementById("canvas-width-input");
+    canvasWidthInput.oninput = function() {
+        if (isNaN(canvasWidthInput.value)) return;
+        canvas.width = +canvasWidthInput.value;
+    };
+
+    const canvasHeightInput = document.getElementById("canvas-height-input");
+    canvasHeightInput.oninput = function() {
+        if (isNaN(canvasHeightInput.value)) return;
+        canvas.height = +canvasHeightInput.value;
+    };
+
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -805,6 +817,10 @@ window.onload = () => {
         let emoteTexture = createTextureFromImage(gl, customPreview);
 
         customPreview.onload = function() {
+            canvasWidthInput.value = this.width;
+            canvasHeightInput.value = this.height;
+            canvas.width = this.width;
+            canvas.height = this.height;
             gl.deleteTexture(emoteTexture);
             emoteTexture = createTextureFromImage(gl, customPreview);
         };
@@ -860,6 +876,8 @@ window.onload = () => {
         }
         const dt = (timestamp - start) * 0.001;
         start = timestamp;
+
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
         gl.uniform1f(program.timeUniform, start * 0.001);
         gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);

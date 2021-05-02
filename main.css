@@ -56,6 +56,19 @@ p {
     animation-timing-function: linear;
 }
 
+.gif-js-opts {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.gif-js-opts > div {
+    margin: 4px;
+}
+
+.canvas-size-input {
+    width: 50px;
+}
+
 @keyframes spinning {
     0% {
         transform: rotate(0deg);
@@ -63,8 +76,4 @@ p {
     100% {
         transform: rotate(360deg);
     }
-}
-
-#custom-preview {
-    width: 112px;
 }
