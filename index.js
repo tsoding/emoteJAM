@@ -814,12 +814,13 @@ window.onload = () => {
             customPreview.src = URL.createObjectURL(this.files[0]);
         };
 
-        const body = document.getElementById("body");
-        body.ondrop = function(event) {
+        // drag file from anywhere
+        document.ondrop = function(event) {
             event.preventDefault();
             customPreview.src = URL.createObjectURL(event.dataTransfer.files[0]);
         }
-        body.ondragover = function(event) {
+
+        document.ondragover = function(event) {
             event.preventDefault();
         }
 
