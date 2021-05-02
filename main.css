@@ -4,6 +4,7 @@ body {
     line-height: 1.6;
     font-size:18px;
     color:#444;
+    background-color: #444;
     padding: 0 10px;
     transition: background-color .5s, color .1s;
 }
@@ -55,6 +56,10 @@ p {
     border-radius: 112px;
     animation: spinning 0.5s infinite;
     animation-timing-function: linear;
+}
+
+.preload, .preload * {
+    transition: none !important;
 }
 
 @keyframes spinning {

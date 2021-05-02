@@ -804,6 +804,7 @@ window.onload = () => {
     window.githubCornerSVG = document.getElementById("github-corner-svg");
     window.theme = localStorage.getItem('theme');
     window.theme != null ? setTheme(window.theme) : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : null;
+    setTimeout(function() { document.body.classList.remove('preload') });
 
     const themeChanger = document.getElementById("theme-changer");
     themeChanger.onclick = function () {
