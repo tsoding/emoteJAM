@@ -817,7 +817,8 @@ window.onload = () => {
         // drag file from anywhere
         document.ondrop = function(event) {
             event.preventDefault();
-            customPreview.src = URL.createObjectURL(event.dataTransfer.files[0]);
+            customFile.files = event.dataTransfer.files;
+            customFile.onchange();
         }
 
         document.ondragover = function(event) {
