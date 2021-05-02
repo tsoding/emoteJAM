@@ -811,6 +811,11 @@ window.onload = () => {
 
         const customFile = document.querySelector("#custom-file");
         customFile.onchange = function() {
+            if (!this.files[0].type.startsWith('image/')) {
+                alert(`ERROR: ${this.files[0].name} is not a valid image`);
+                customFile.value = '';
+                return;
+            }
             customPreview.src = URL.createObjectURL(this.files[0]);
         };
 
