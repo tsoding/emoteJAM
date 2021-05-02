@@ -6,6 +6,8 @@ That idea is to apply a well established "meme meta filters" to static emotes. S
 
 The most important feature of the website is that it's completely client-side and can be easily deployed to something like [GitHub Pages](https://pages.github.com/). It uses [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) to animate static images and [gif.js](https://jnordberg.github.io/gif.js/) to generate actual GIF files inside of your browser.
 
+Official Deployed Instance: [https://tsoding.org/emoteJAM/](https://tsoding.org/emoteJAM/)
+
 ## Running Locally
 
 Nothing particularly special is required. Just serve the folder using HTTP server like Python's SimpleHTTPServer:
