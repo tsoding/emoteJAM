@@ -782,7 +782,7 @@ window.onload = () => {
     };
 
     const canvas = document.getElementById("preview");
-    const gl = canvas.getContext("webgl");
+    const gl = canvas.getContext("webgl", {antialias: false, alpha: false});
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
     }
