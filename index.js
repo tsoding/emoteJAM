@@ -3,6 +3,7 @@ const TRIANGLE_VERTICIES = 3;
 const VEC2_COUNT = 2;
 const VEC2_X = 0;
 const VEC2_Y = 1;
+var setCustomFile;
 
 function shaderTypeToString(gl, shaderType) {
     switch (shaderType) {
@@ -10,6 +11,18 @@ function shaderTypeToString(gl, shaderType) {
     case gl.FRAGMENT_SHADER: return 'Fragment';
     default: return shaderType;
     }
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+
+function dropHandler(event) {
+    event.preventDefault();
+    setCustomFile(event.dataTransfer.files[0]);
+}
+
+function hoverHandler(event) {
+    // Prevent file from being opened
+    event.preventDefault();
 }
 
 function compileShaderSource(gl, source, shaderType) {
@@ -813,6 +826,9 @@ window.onload = () => {
         customFile.onchange = function() {
             customPreview.src = URL.createObjectURL(this.files[0]);
         };
+        setCustomFile = function(file) {
+            customPreview.src = URL.createObjectURL(file);
+        }
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
