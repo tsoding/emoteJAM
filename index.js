@@ -823,6 +823,16 @@ function removeFileNameExt(fileName) {
 
 window.onload = () => {
     const filtersSelect = document.getElementById("filters");
+    filtersSelect.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+            this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
+        }
+        if (e.deltaY > 0) {
+            this.selectedIndex = Math.min(this.selectedIndex + 1, this.length - 1);
+        }
+        this.onchange();
+    });
     for (let name in filters) {
         filtersSelect.add(new Option(name));
     }
