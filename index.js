@@ -1,3 +1,4 @@
+const LOAD_FILTER_TIMEOUT_MS = 20;
 const TRIANGLE_PAIR = 2;
 const TRIANGLE_VERTICIES = 3;
 const VEC2_COUNT = 2;
@@ -227,9 +228,18 @@ async function fetchShaderSource(url) {
     return fetch(url, {cache: "default"}).then(response => response.text());
 }
 
-async function loadFilterProgram(gl, filter, vertexAttribs) {
+async function loadFilterProgram(gl, filter, vertexAttribs, timeoutFn = () => {}) {
+    let shadersFetched = false;
+    setTimeout(() => {
+        if (!shadersFetched) {
+            timeoutFn();
+        }
+    }, LOAD_FILTER_TIMEOUT_MS);
+
     const vertexSource = await fetchShaderSource(filter.vertex);
     const fragmentSource = await fetchShaderSource(filter.fragment);
+    shadersFetched = true;
+
     const vertexShader = compileShaderSource(gl, vertexSource, gl.VERTEX_SHADER);
     const fragmentShader = compileShaderSource(gl, fragmentSource, gl.FRAGMENT_SHADER);
     const id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
@@ -255,16 +265,32 @@ function removeFileNameExt(fileName) {
 }
 
 window.onload = async () => {
+    const canvas = document.getElementById("preview");
     const filtersSelect = document.getElementById("filters");
-    for (let name in filters) {
+    const widgetFilter = document.getElementById("widget-filter");
+    const customPreview = document.querySelector("#custom-preview");
+    const customFile = document.querySelector("#custom-file");
+    const renderButton = document.querySelector("#render");
+
+    for (const name of Object.keys(filters)) {
         filtersSelect.add(new Option(name));
     }
 
+    let shouldDraw = true;
     const vertexAttribs = {
         "meshPosition": 0
     };
 
-    const canvas = document.getElementById("preview");
+    const getCurrentFilter = () => filters[filtersSelect.selectedOptions[0].value];
+
+    const setBusyLoading = (isBusy) => {
+        shouldDraw = !isBusy;
+        renderButton.disabled = isBusy;
+        widgetFilter.dataset.isLoading = isBusy;
+    };
+
+    const filterLoadTimeout = () => setBusyLoading(true);
+    
     const gl = canvas.getContext("webgl", {antialias: false, alpha: false});
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
@@ -273,18 +299,20 @@ window.onload = async () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let program = await loadFilterProgram(gl, filters[filtersSelect.selectedOptions[0].value], vertexAttribs);
+    let program = await loadFilterProgram(gl, getCurrentFilter(), vertexAttribs, filterLoadTimeout);
+    setBusyLoading(false);
 
-    filtersSelect.onchange = async function () {
+    filtersSelect.onchange = async () => {
         gl.deleteProgram(program.id);
-        program = await loadFilterProgram(gl, filters[this.selectedOptions[0].value], vertexAttribs);
+        program = await loadFilterProgram(gl, getCurrentFilter(), vertexAttribs, filterLoadTimeout);
+        setBusyLoading(false);
     };
 
-    let gif = undefined;
+    let gif;
 
     // Bitmap Font
     {
-        const customPreview = document.querySelector("#custom-preview");
+        
         let emoteTexture = createTextureFromImage(gl, customPreview);
 
         customPreview.onload = function() {
@@ -292,7 +320,7 @@ window.onload = async () => {
             emoteTexture = createTextureFromImage(gl, customPreview);
         };
 
-        const customFile = document.querySelector("#custom-file");
+       
         customFile.onchange = function() {
             if (!this.files[0].type.startsWith('image/')) {
                 customFile.value = '';
@@ -307,13 +335,12 @@ window.onload = async () => {
             event.preventDefault();
             customFile.files = event.dataTransfer.files;
             customFile.onchange();
-        }
+        };
 
         document.ondragover = function(event) {
             event.preventDefault();
-        }
-
-        const renderButton = document.querySelector("#render");
+        };
+        
         renderButton.onclick = function() {
             if (gif && gif.running) {
                 gif.abort();
@@ -365,10 +392,11 @@ window.onload = async () => {
         gl.uniform1f(program.timeUniform, start * 0.001);
         gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
 
-        gl.clearColor(0.0, 1.0, 0.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
-        gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
+        if (shouldDraw) {
+            gl.clearColor(0.0, 1.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
+        }
 
         window.requestAnimationFrame(step);
     }
