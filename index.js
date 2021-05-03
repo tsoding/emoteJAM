@@ -802,6 +802,8 @@ window.onload = () => {
     // Bitmap Font
     {
         const customPreview = document.querySelector("#custom-preview");
+        customPreview.crossOrigin = "anonymous";
+
         let emoteTexture = createTextureFromImage(gl, customPreview);
 
         customPreview.onload = function() {
@@ -813,6 +815,16 @@ window.onload = () => {
         customFile.onchange = function() {
             customPreview.src = URL.createObjectURL(this.files[0]);
         };
+
+        document.onpaste = function(e) {
+            let text = e.clipboardData.getData('text');
+            if (text.startsWith('http')) {
+                customPreview.src = text;
+            } else if (e.clipboardData.files.length > 0) {
+                customFile.files = e.clipboardData.files;
+                customFile.onchange();
+            }
+        }
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
