@@ -766,6 +766,14 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
     };
 }
 
+function removeFileNameExt(fileName) {
+    if (fileName.includes('.')) {
+        return fileName.split('.').slice(0, -1).join('.');
+    } else {
+        return fileName;
+    }
+}
+
 window.onload = () => {
     const presetsSelect = document.getElementById("presets");
     for (let name in presets) {
@@ -815,15 +823,8 @@ window.onload = () => {
                 gif.abort();
             }
             const file = customFile.files[0];
-            let filename;
-            if (file) {
-                filename = file.name.split('.');
-                filename.pop();
-                filename = filename.join('');
-            } else {
-                filename = 'result';
-            }
-            gif = render(gl, canvas, program, filename);
+            let filename = file ? removeFileNameExt(file.name) : 'result';
+            gif = render(gl, canvas, program, `${filename}.gif`);
         };
     }
 
