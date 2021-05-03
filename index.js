@@ -653,7 +653,7 @@ void main() {
     },
 	"Peek":{
         "transparent": 0x00FF00,
-        "duration": 5.0 * Math.PI ,
+        "duration": 4.0 * Math.PI ,
         "vertex": `#version 100
 precision mediump float;
 
