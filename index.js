@@ -22,7 +22,6 @@ function compileShaderSource(gl, source, shaderType) {
     return shader;
 }
 
-
 function linkShaderProgram(gl, shaders, vertexAttribs) {
     const program = gl.createProgram();
     for (let shader of shaders) {
@@ -119,12 +118,12 @@ const filters = {
         "vertex": "glsl/hard.vs",
         "fragment": "glsl/hard.fs",
     },
-	"Peek":{
+    "Peek":{
         "transparent": 0x00FF00,
         "duration": 2.0 * Math.PI ,
         "vertex": "glsl/peek.vs",
         "fragment": "glsl/peek.fs", 
-	},
+    },
 };
 
 function createTextureFromImage(gl, image) {
@@ -224,13 +223,20 @@ function render(gl, canvas, program, filename) {
     return gif;
 }
 
-function loadFilterProgram(gl, filter, vertexAttribs) {
-    let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
-    let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
+async function fetchShaderSource(url) {
+    return fetch(url, {cache: "default"}).then(response => response.text());
+}
+
+async function loadFilterProgram(gl, filter, vertexAttribs) {
+    const vertexSource = await fetchShaderSource(filter.vertex);
+    const fragmentSource = await fetchShaderSource(filter.fragment);
+    const vertexShader = compileShaderSource(gl, vertexSource, gl.VERTEX_SHADER);
+    const fragmentShader = compileShaderSource(gl, fragmentSource, gl.FRAGMENT_SHADER);
+    const id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
     gl.useProgram(id);
+
     return {
         "id": id,
         "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
@@ -248,7 +254,7 @@ function removeFileNameExt(fileName) {
     }
 }
 
-window.onload = () => {
+window.onload = async () => {
     const filtersSelect = document.getElementById("filters");
     for (let name in filters) {
         filtersSelect.add(new Option(name));
@@ -267,11 +273,11 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let program = loadFilterProgram(gl, filters[filtersSelect.selectedOptions[0].value], vertexAttribs);
+    let program = await loadFilterProgram(gl, filters[filtersSelect.selectedOptions[0].value], vertexAttribs);
 
-    filtersSelect.onchange = function() {
+    filtersSelect.onchange = async function () {
         gl.deleteProgram(program.id);
-        program = loadFilterProgram(gl, filters[this.selectedOptions[0].value], vertexAttribs);
+        program = await loadFilterProgram(gl, filters[this.selectedOptions[0].value], vertexAttribs);
     };
 
     let gif = undefined;
