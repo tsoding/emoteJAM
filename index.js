@@ -1,3 +1,4 @@
+const LOAD_FILTER_TIMEOUT_MS = 20;
 const TRIANGLE_PAIR = 2;
 const TRIANGLE_VERTICIES = 3;
 const VEC2_COUNT = 2;
@@ -22,7 +23,6 @@ function compileShaderSource(gl, source, shaderType) {
     return shader;
 }
 
-
 function linkShaderProgram(gl, shaders, vertexAttribs) {
     const program = gl.createProgram();
     for (let shader of shaders) {
@@ -44,660 +44,87 @@ const filters = {
     "Hop": {
         "transparent": 0x00FF00,
         "duration": 0.85 * 2,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-uniform float time;
-
-varying vec2 uv;
-
-float sliding_from_left_to_right(float time_interval) {
-    return (mod(time, time_interval) - time_interval * 0.5) / (time_interval * 0.5);
-}
-
-float flipping_directions(float time_interval) {
-    return 1.0 - 2.0 * mod(floor(time / time_interval), 2.0);
-}
-
-void main() {
-    float scale = 0.40;
-    float hops = 2.0;
-    float x_time_interval = 0.85;
-    float y_time_interval = x_time_interval / (2.0 * hops);
-    float height = 0.5;
-    vec2 offset = vec2(
-        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval) * (1.0 - scale),
-        ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
-
-    gl_Position = vec4(
-        meshPosition * scale + offset,
-        0.0,
-        1.0);
-
-    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
-
-    uv.x = (flipping_directions(x_time_interval) + 1.0) / 2.0 - uv.x * flipping_directions(x_time_interval);
-}
-`,
-        "fragment": `#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`
+        "vertex": "glsl/hop.vs",
+        "fragment": "glsl/hop.fs"
     },
     "Hopper": {
         "transparent": 0x00FF00,
         "duration": 0.85,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-uniform float time;
-
-varying vec2 uv;
-
-float sliding_from_left_to_right(float time_interval) {
-    return (mod(time, time_interval) - time_interval * 0.5) / (time_interval * 0.5);
-}
-
-float flipping_directions(float time_interval) {
-    return 1.0 - 2.0 * mod(floor(time / time_interval), 2.0);
-}
-
-void main() {
-    float scale = 0.40;
-    float hops = 2.0;
-    float x_time_interval = 0.85 / 2.0;
-    float y_time_interval = x_time_interval / (2.0 * hops);
-    float height = 0.5;
-    vec2 offset = vec2(
-        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval) * (1.0 - scale),
-        ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
-
-    gl_Position = vec4(
-        meshPosition * scale + offset,
-        0.0,
-        1.0);
-
-    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
-
-    uv.x = (flipping_directions(x_time_interval) + 1.0) / 2.0 - uv.x * flipping_directions(x_time_interval);
-}
-`,
-        "fragment": `#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`
+        "vertex": "glsl/hopper.vs",
+        "fragment": "glsl/hopper.fs"
     },
     "Overheat": {
         "transparent": 0x00FF00,
         "duration": 0.85 / 8.0 * 2.0,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-uniform float time;
-
-varying vec2 uv;
-
-float sliding_from_left_to_right(float time_interval) {
-    return (mod(time, time_interval) - time_interval * 0.5) / (time_interval * 0.5);
-}
-
-float flipping_directions(float time_interval) {
-    return 1.0 - 2.0 * mod(floor(time / time_interval), 2.0);
-}
-
-void main() {
-    float scale = 0.40;
-    float hops = 2.0;
-    float x_time_interval = 0.85 / 8.0;
-    float y_time_interval = x_time_interval / (2.0 * hops);
-    float height = 0.5;
-    vec2 offset = vec2(
-        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval) * (1.0 - scale),
-        ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
-
-    gl_Position = vec4(
-        meshPosition * scale + offset,
-        0.0,
-        1.0);
-
-    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
-
-    uv.x = (flipping_directions(x_time_interval) + 1.0) / 2.0 - uv.x * flipping_directions(x_time_interval);
-}
-`,
-        "fragment": `#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y)) * vec4(1.0, 0.0, 0.0, 1.0);
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`
+        "vertex": "glsl/overheat.vs",
+        "fragment": "glsl/overheat.fs"
     },
     "Bounce": {
         "transparent": 0x00FF00,
         "duration": Math.PI / 5.0,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    float scale = 0.30;
-    float period_interval = 5.0;
-    vec2 offset = vec2(0.0, (2.0 * abs(sin(time * period_interval)) - 1.0) * (1.0 - scale));
-    gl_Position = vec4(meshPosition * scale + offset, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`,
+        "vertex": "glsl/bounce.vs",
+        "fragment": "glsl/bounce.fs",
     },
     "Circle": {
         "transparent": 0x00FF00,
         "duration": Math.PI / 4.0,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-vec2 rotate(vec2 v, float a) {
-	float s = sin(a);
-	float c = cos(a);
-	mat2 m = mat2(c, -s, s, c);
-	return m * v;
-}
-
-void main() {
-    float scale = 0.30;
-    float period_interval = 8.0;
-    float pi = 3.141592653589793238;
-    vec2 outer_circle = vec2(cos(period_interval * time), sin(period_interval * time)) * (1.0 - scale);
-    vec2 inner_circle = rotate(meshPosition * scale, (-period_interval * time) + pi / 2.0);
-    gl_Position = vec4(
-        inner_circle + outer_circle,
-        0.0,
-        1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    float speed = 1.0;
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`,
+        "vertex": "glsl/circle.vs",
+        "fragment": "glsl/circle.fs",
     },
     "Slide": {
         "transparent": 0x00FF00,
         "duration": 0.85 * 2,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-uniform float time;
-
-varying vec2 uv;
-
-float sliding_from_left_to_right(float time_interval) {
-    return (mod(time, time_interval) - time_interval * 0.5) / (time_interval * 0.5);
-}
-
-float flipping_directions(float time_interval) {
-    return 1.0 - 2.0 * mod(floor(time / time_interval), 2.0);
-}
-
-void main() {
-    float scale = 0.40;
-    float hops = 2.0;
-    float x_time_interval = 0.85;
-    float y_time_interval = x_time_interval / (2.0 * hops);
-    float height = 0.5;
-    vec2 offset = vec2(
-        sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval) * (1.0 - scale),
-        - height);
-
-    gl_Position = vec4(
-        meshPosition * scale + offset,
-        0.0,
-        1.0);
-
-    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
-
-    uv.x = (flipping_directions(x_time_interval) + 1.0) / 2.0 - uv.x * flipping_directions(x_time_interval);
-}
-`,
-        "fragment": `#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`
+        "vertex": "glsl/slide.vs",
+        "fragment": "glsl/slide.fs"
     },
     "Laughing": {
         "transparent": 0x00FF00,
         "duration": Math.PI / 12.0,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    float a = 0.3;
-    float t = (sin(24.0 * time) * a + a) / 2.0;
-
-    gl_Position = vec4(
-        meshPosition - vec2(0.0, t),
-        0.0,
-        1.0);
-    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
-}
-`,
-        "fragment": `#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`
+        "vertex": "glsl/laughing.vs",
+        "fragment": "glsl/laughing.fs"
     },
     "Blob": {
         "transparent": 0x00FF00,
         "duration": Math.PI / 3,
-        "vertex": `#version 100
-
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    float stretch = sin(6.0 * time) * 0.5 + 1.0;
-
-    vec2 offset = vec2(0.0, 1.0 - stretch);
-    gl_Position = vec4(
-        meshPosition * vec2(stretch, 2.0 - stretch) + offset,
-        0.0,
-        1.0);
-    uv = (meshPosition + vec2(1.0, 1.0)) / 2.0;
-}
-`,
-        "fragment": `#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`
+        "vertex": "glsl/blob.vs",
+        "fragment": "glsl/blob.fs"
     },
     "Go": {
         "transparent": 0x00FF00,
         "duration": 1 / 4,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    gl_Position = vec4(meshPosition, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-float slide(float speed, float value) {
-    return mod(value - speed * time, 1.0);
-}
-
-void main() {
-    float speed = 4.0;
-    gl_FragColor = texture2D(emote, vec2(slide(speed, uv.x), 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`,
+        "vertex": "glsl/go.vs",
+        "fragment": "glsl/go.fs",
     },
     "Elevator": {
         "transparent": 0x00FF00,
         "duration": 1 / 4,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    gl_Position = vec4(meshPosition, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-float slide(float speed, float value) {
-    return mod(value - speed * time, 1.0);
-}
-
-void main() {
-    float speed = 4.0;
-    gl_FragColor = texture2D(
-        emote,
-        vec2(uv.x, slide(speed, 1.0 - uv.y)));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`,
+        "vertex": "glsl/elevator.vs",
+        "fragment": "glsl/elevator.fs",
     },
     "Rain": {
         "transparent": 0x00FF00,
         "duration": 1,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    gl_Position = vec4(meshPosition, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-float slide(float speed, float value) {
-    return mod(value - speed * time, 1.0);
-}
-
-void main() {
-    float speed = 1.0;
-    gl_FragColor = texture2D(
-        emote,
-        vec2(mod(4.0 * slide(speed, uv.x), 1.0),
-             mod(4.0 * slide(speed, 1.0 - uv.y), 1.0)));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`,
+        "vertex": "glsl/rain.vs",
+        "fragment": "glsl/rain.fs",
     },
     "Pride": {
         "transparent": null,
         "duration": 2.0,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    gl_Position = vec4(meshPosition, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-vec3 hsl2rgb(vec3 c) {
-    vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0);
-    return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
-}
-
-void main() {
-    float speed = 1.0;
-
-    vec4 pixel = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    pixel.w = floor(pixel.w + 0.5);
-    pixel = vec4(mix(vec3(1.0), pixel.xyz, pixel.w), 1.0);
-    vec4 rainbow = vec4(hsl2rgb(vec3((time - uv.x - uv.y) * 0.5, 1.0, 0.80)), 1.0);
-    gl_FragColor = pixel * rainbow;
-}
-`,
+        "vertex": "glsl/pride.vs",
+        "fragment": "glsl/pride.fs"
     },
     "Hard": {
         "transparent": 0x00FF00,
         "duration": 2.0 * Math.PI / 32.0,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    float zoom = 1.4;
-    float intensity = 32.0;
-    float amplitude = 1.0 / 8.0;
-    vec2 shaking = vec2(cos(intensity * time), sin(intensity * time)) * amplitude;
-    gl_Position = vec4(meshPosition * zoom + shaking, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`,
+        "vertex": "glsl/hard.vs",
+        "fragment": "glsl/hard.fs",
     },
-	"Peek":{
+    "Peek":{
         "transparent": 0x00FF00,
         "duration": 2.0 * Math.PI ,
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    float time_clipped= mod(time * 2.0, (4.0 * 3.14));
-
-    float s1 = float(time_clipped < (2.0 * 3.14));
-    float s2 = 1.0 - s1;
-
-    float hold1 = float(time_clipped > (0.5 * 3.14) && time_clipped < (2.0 * 3.14));
-    float hold2 = 1.0 - float(time_clipped > (2.5 * 3.14) && time_clipped < (4.0 * 3.14));
-
-    float cycle_1 = 1.0 - ((s1 * sin(time_clipped) * (1.0 - hold1)) + hold1);
-    float cycle_2 = s2 * hold2 * (sin(time_clipped) - 1.0); 
-
-    gl_Position = vec4(meshPosition.x + 1.0 + cycle_1 + cycle_2 , meshPosition.y, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-void main() {
-    gl_FragColor = texture2D(emote, vec2(uv.x, 1.0 - uv.y));
-    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
-}
-`, 
-	},
+        "vertex": "glsl/peek.vs",
+        "fragment": "glsl/peek.fs", 
+    },
 };
 
 function createTextureFromImage(gl, image) {
@@ -797,13 +224,29 @@ function render(gl, canvas, program, filename) {
     return gif;
 }
 
-function loadFilterProgram(gl, filter, vertexAttribs) {
-    let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
-    let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
+async function fetchShaderSource(url) {
+    return fetch(url, {cache: "default"}).then(response => response.text());
+}
+
+async function loadFilterProgram(gl, filter, vertexAttribs, timeoutFn = () => {}) {
+    let shadersFetched = false;
+    setTimeout(() => {
+        if (!shadersFetched) {
+            timeoutFn();
+        }
+    }, LOAD_FILTER_TIMEOUT_MS);
+
+    const vertexSource = await fetchShaderSource(filter.vertex);
+    const fragmentSource = await fetchShaderSource(filter.fragment);
+    shadersFetched = true;
+
+    const vertexShader = compileShaderSource(gl, vertexSource, gl.VERTEX_SHADER);
+    const fragmentShader = compileShaderSource(gl, fragmentSource, gl.FRAGMENT_SHADER);
+    const id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
     gl.useProgram(id);
+
     return {
         "id": id,
         "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
@@ -821,17 +264,33 @@ function removeFileNameExt(fileName) {
     }
 }
 
-window.onload = () => {
+window.onload = async () => {
+    const canvas = document.getElementById("preview");
     const filtersSelect = document.getElementById("filters");
-    for (let name in filters) {
+    const widgetFilter = document.getElementById("widget-filter");
+    const customPreview = document.querySelector("#custom-preview");
+    const customFile = document.querySelector("#custom-file");
+    const renderButton = document.querySelector("#render");
+
+    for (const name of Object.keys(filters)) {
         filtersSelect.add(new Option(name));
     }
 
+    let shouldDraw = true;
     const vertexAttribs = {
         "meshPosition": 0
     };
 
-    const canvas = document.getElementById("preview");
+    const getCurrentFilter = () => filters[filtersSelect.selectedOptions[0].value];
+
+    const setBusyLoading = (isBusy) => {
+        shouldDraw = !isBusy;
+        renderButton.disabled = isBusy;
+        widgetFilter.dataset.isLoading = isBusy;
+    };
+
+    const filterLoadTimeout = () => setBusyLoading(true);
+    
     const gl = canvas.getContext("webgl", {antialias: false, alpha: false});
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
@@ -840,18 +299,20 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let program = loadFilterProgram(gl, filters[filtersSelect.selectedOptions[0].value], vertexAttribs);
+    let program = await loadFilterProgram(gl, getCurrentFilter(), vertexAttribs, filterLoadTimeout);
+    setBusyLoading(false);
 
-    filtersSelect.onchange = function() {
+    filtersSelect.onchange = async () => {
         gl.deleteProgram(program.id);
-        program = loadFilterProgram(gl, filters[this.selectedOptions[0].value], vertexAttribs);
+        program = await loadFilterProgram(gl, getCurrentFilter(), vertexAttribs, filterLoadTimeout);
+        setBusyLoading(false);
     };
 
-    let gif = undefined;
+    let gif;
 
     // Bitmap Font
     {
-        const customPreview = document.querySelector("#custom-preview");
+        
         let emoteTexture = createTextureFromImage(gl, customPreview);
 
         customPreview.onload = function() {
@@ -859,7 +320,7 @@ window.onload = () => {
             emoteTexture = createTextureFromImage(gl, customPreview);
         };
 
-        const customFile = document.querySelector("#custom-file");
+       
         customFile.onchange = function() {
             if (!this.files[0].type.startsWith('image/')) {
                 customFile.value = '';
@@ -874,13 +335,12 @@ window.onload = () => {
             event.preventDefault();
             customFile.files = event.dataTransfer.files;
             customFile.onchange();
-        }
+        };
 
         document.ondragover = function(event) {
             event.preventDefault();
-        }
-
-        const renderButton = document.querySelector("#render");
+        };
+        
         renderButton.onclick = function() {
             if (gif && gif.running) {
                 gif.abort();
@@ -932,10 +392,11 @@ window.onload = () => {
         gl.uniform1f(program.timeUniform, start * 0.001);
         gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
 
-        gl.clearColor(0.0, 1.0, 0.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
-        gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
+        if (shouldDraw) {
+            gl.clearColor(0.0, 1.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
+        }
 
         window.requestAnimationFrame(step);
     }

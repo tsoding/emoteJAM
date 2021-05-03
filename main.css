@@ -68,3 +68,14 @@ p {
 #custom-preview {
     width: 112px;
 }
+
+#widget-filter[data-is-loading=true] #preview {
+    opacity: 0.5;
+}
+
+#widget-filter[data-is-loading=true] #select-filters:after {
+    content: "(Loading...)";
+    position: absolute;
+    padding-left: 8px;
+    opacity: 0.5;
+}
