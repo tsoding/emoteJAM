@@ -817,6 +817,17 @@ window.onload = () => {
             customPreview.src = URL.createObjectURL(this.files[0]);
         };
 
+        // drag file from anywhere
+        document.ondrop = function(event) {
+            event.preventDefault();
+            customFile.files = event.dataTransfer.files;
+            customFile.onchange();
+        }
+
+        document.ondragover = function(event) {
+            event.preventDefault();
+        }
+
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
             if (gif && gif.running) {
