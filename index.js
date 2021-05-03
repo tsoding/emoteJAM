@@ -814,7 +814,12 @@ window.onload = () => {
 
         const customFile = document.querySelector("#custom-file");
         customFile.onchange = function() {
-            customPreview.src = URL.createObjectURL(this.files[0]);
+            if (!this.files[0].type.startsWith('image/')) {
+                customFile.value = '';
+                customPreview.src = 'error.png';
+            } else {
+                customPreview.src = URL.createObjectURL(this.files[0]);
+            }
         };
 
         // drag file from anywhere
