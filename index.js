@@ -40,7 +40,7 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
     return program;
 }
 
-const presets = {
+const filters = {
     "Hop": {
         "transparent": 0x00FF00,
         "duration": 0.85 * 2,
@@ -797,9 +797,9 @@ function render(gl, canvas, program, filename) {
     return gif;
 }
 
-function loadPresetsProgram(gl, preset, vertexAttribs) {
-    let vertexShader = compileShaderSource(gl, preset.vertex, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, preset.fragment, gl.FRAGMENT_SHADER);
+function loadFilterProgram(gl, filter, vertexAttribs) {
+    let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
+    let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
     let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
@@ -808,8 +808,8 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
         "id": id,
         "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
         "timeUniform": gl.getUniformLocation(id, 'time'),
-        "duration": preset.duration,
-        "transparent": preset.transparent,
+        "duration": filter.duration,
+        "transparent": filter.transparent,
     };
 }
 
@@ -822,9 +822,9 @@ function removeFileNameExt(fileName) {
 }
 
 window.onload = () => {
-    const presetsSelect = document.getElementById("presets");
-    for (let name in presets) {
-        presetsSelect.add(new Option(name));
+    const filtersSelect = document.getElementById("filters");
+    for (let name in filters) {
+        filtersSelect.add(new Option(name));
     }
 
     const vertexAttribs = {
@@ -840,11 +840,11 @@ window.onload = () => {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    let program = loadPresetsProgram(gl, presets[presetsSelect.selectedOptions[0].value], vertexAttribs);
+    let program = loadFilterProgram(gl, filters[filtersSelect.selectedOptions[0].value], vertexAttribs);
 
-    presetsSelect.onchange = function() {
+    filtersSelect.onchange = function() {
         gl.deleteProgram(program.id);
-        program = loadPresetsProgram(gl, presets[this.selectedOptions[0].value], vertexAttribs);
+        program = loadFilterProgram(gl, filters[this.selectedOptions[0].value], vertexAttribs);
     };
 
     let gif = undefined;
