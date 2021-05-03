@@ -653,7 +653,7 @@ void main() {
     },
 	"Peek":{
         "transparent": 0x00FF00,
-        "duration": 4.0 * Math.PI ,
+        "duration": 2.0 * Math.PI ,
         "vertex": `#version 100
 precision mediump float;
 
@@ -665,7 +665,7 @@ uniform float time;
 varying vec2 uv;
 
 void main() {
-    float time_clipped= mod(time, (4.0 * 3.14));
+    float time_clipped= mod(time * 2.0, (4.0 * 3.14));
 
     float s1 = float(time_clipped < (2.0 * 3.14));
     float s2 = 1.0 - s1;
