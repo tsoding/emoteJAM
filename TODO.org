@@ -10,19 +10,7 @@
   - [ ] "Render & Upload to BTTV" button (should just automatically
     upload the newly generated emote on your BTTV account)
   - [ ] Download existing emotes from BTTV, FFZ and Twitch (by just name since it's unique for the whole platform)
-  - [ ] Custom shaders
-    - Some random ideas
-      - Store shaders in local storage
-      - Store shaders in something gist
-      - Export/import presets as a JSON file
-  - [ ] Preset parameters
-    - This is more for people who don't know shaders. Presets may have
-      special custom parameters that can be modified with UI elements.
   - [ ] Ability to pause the animation
-  - [ ] Support for GIFs as an input
-    - I think you can access individual frames of the GIF image. We
-      may try to turn each of them into a GL texture and animate
-      properly in the WebGL view
   - [ ] Get rid of the "Render" buttons
     - Just rerender every time something changes
       - With WebAssembly sped up gif.js this will be especially nice
