@@ -673,7 +673,7 @@ function createTextureFromImage(gl, image) {
     return textureId;
 }
 
-function render(gl, canvas, program) {
+function render(gl, canvas, program, filename) {
     var gif = new GIF({
         workers: 5,
         quality: 10,
@@ -735,12 +735,7 @@ function render(gl, canvas, program) {
         renderPreview.src = URL.createObjectURL(blob);
         renderPreview.style.display = "block";
         renderDownload.href = renderPreview.src;
-        file = document.querySelector("#custom-file").files[0];
-        if (file) {
-            file = file.name.split('.');
-            file.pop();
-        }
-        renderDownload.download = file ? file.join('') : "result";
+        renderDownload.download = filename;
         renderDownload.style.display = "block";
         renderSpinner.style.display = "none";
 
@@ -771,6 +766,14 @@ function loadPresetsProgram(gl, preset, vertexAttribs) {
     };
 }
 
+function removeFileNameExt(fileName) {
+    if (fileName.includes('.')) {
+        return fileName.split('.').slice(0, -1).join('.');
+    } else {
+        return fileName;
+    }
+}
+
 window.onload = () => {
     const presetsSelect = document.getElementById("presets");
     for (let name in presets) {
@@ -782,7 +785,7 @@ window.onload = () => {
     };
 
     const canvas = document.getElementById("preview");
-    const gl = canvas.getContext("webgl");
+    const gl = canvas.getContext("webgl", {antialias: false, alpha: false});
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
     }
@@ -819,12 +822,25 @@ window.onload = () => {
             }
         };
 
+        // drag file from anywhere
+        document.ondrop = function(event) {
+            event.preventDefault();
+            customFile.files = event.dataTransfer.files;
+            customFile.onchange();
+        }
+
+        document.ondragover = function(event) {
+            event.preventDefault();
+        }
+
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
             if (gif && gif.running) {
                 gif.abort();
             }
-            gif = render(gl, canvas, program);
+            const file = customFile.files[0];
+            let filename = file ? removeFileNameExt(file.name) : 'result';
+            gif = render(gl, canvas, program, `${filename}.gif`);
         };
     }
 
