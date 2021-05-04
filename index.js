@@ -870,10 +870,34 @@ window.onload = () => {
         };
 
         // drag file from anywhere
+        const dropFileZone = document.querySelector("#drop-file-zone");
+
+        function showDropFileZone() {
+            dropFileZone.style.display = "flex";
+            // this prevents dragleave event being triggered while hovering on a child element
+            document.getElementsByTagName("body")[0].style.pointerEvents = "none";
+        }
+
+        function hideDropFileZone() {
+            dropFileZone.style.display = "none";
+            document.getElementsByTagName("body")[0].style.pointerEvents = "auto";
+        }
+
+        document.ondragenter = function(event) {
+            event.preventDefault();
+            showDropFileZone();
+        }
+
+        document.ondragleave = function(event) {
+            event.preventDefault();
+            hideDropFileZone();
+        }
+
         document.ondrop = function(event) {
             event.preventDefault();
             customFile.files = event.dataTransfer.files;
             customFile.onchange();
+            hideDropFileZone();
         }
 
         document.ondragover = function(event) {
