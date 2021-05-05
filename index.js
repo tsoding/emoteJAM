@@ -931,6 +931,7 @@ window.onload = () => {
 
             dragCounter = 0;
             hideDropFileZone();
+            window.removeEventListener("scroll", lockScroll);
         });
         
 
