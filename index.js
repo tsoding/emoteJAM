@@ -871,38 +871,54 @@ window.onload = () => {
 
         // drag file from anywhere
         const dropFileZone = document.querySelector("#drop-file-zone");
+        let dragCounter = 0;
 
         function showDropFileZone() {
             dropFileZone.style.display = "flex";
-            // this prevents dragleave event being triggered while hovering on a child element
-            document.getElementsByTagName("body")[0].style.pointerEvents = "none";
         }
 
         function hideDropFileZone() {
             dropFileZone.style.display = "none";
-            document.getElementsByTagName("body")[0].style.pointerEvents = "auto";
         }
 
-        document.ondragenter = function(event) {
+        window.addEventListener("dragenter", (event) => {
             event.preventDefault();
-            showDropFileZone();
-        }
+            event.stopPropagation();
 
-        document.ondragleave = function(event) {
+            dragCounter++;
+            if(event.dataTransfer.items.length && event.dataTransfer.items[0].kind === "file") {
+                showDropFileZone();
+            }
+        });
+
+        window.addEventListener("dragleave", (event) => {
             event.preventDefault();
+            event.stopPropagation();
+
+            dragCounter--;
+            if(dragCounter === 0) {
+                hideDropFileZone();
+            }
+        });
+
+        window.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        })
+
+        window.addEventListener("drop", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if(event.dataTransfer.files.length){
+                customFile.files = event.dataTransfer.files;
+                customFile.onchange();
+            }
+
+            dragCounter = 0;
             hideDropFileZone();
-        }
-
-        document.ondrop = function(event) {
-            event.preventDefault();
-            customFile.files = event.dataTransfer.files;
-            customFile.onchange();
-            hideDropFileZone();
-        }
-
-        document.ondragover = function(event) {
-            event.preventDefault();
-        }
+        })
+        
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {
