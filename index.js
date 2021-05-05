@@ -881,6 +881,15 @@ window.onload = () => {
             dropFileZone.style.display = "none";
         }
 
+        const scrollPosition = {
+            x: 0,
+            y: 0
+        };
+
+        function lockScroll() {
+            window.scroll(scrollPosition.x, scrollPosition.y);
+        }
+
         window.addEventListener("dragenter", (event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -888,6 +897,10 @@ window.onload = () => {
             dragCounter++;
             if(event.dataTransfer.items.length && event.dataTransfer.items[0].kind === "file") {
                 showDropFileZone();
+
+                scrollPosition.y = window.scrollY;
+                scrollPosition.x = window.scrollX;
+                window.addEventListener("scroll", lockScroll);
             }
         });
 
@@ -896,28 +909,29 @@ window.onload = () => {
             event.stopPropagation();
 
             dragCounter--;
-            if(dragCounter === 0) {
+            if (dragCounter === 0) {
                 hideDropFileZone();
+                window.removeEventListener("scroll", lockScroll);
             }
         });
 
         window.addEventListener("dragover", (event) => {
             event.preventDefault();
             event.stopPropagation();
-        })
+        });
 
         window.addEventListener("drop", (event) => {
             event.preventDefault();
             event.stopPropagation();
 
-            if(event.dataTransfer.files.length){
+            if (event.dataTransfer.files.length) {
                 customFile.files = event.dataTransfer.files;
                 customFile.onchange();
             }
 
             dragCounter = 0;
             hideDropFileZone();
-        })
+        });
         
 
         const renderButton = document.querySelector("#render");
