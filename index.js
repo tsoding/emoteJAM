@@ -801,7 +801,7 @@ void main() {
         `
     },
     "Flag":{
-        "transparent": null,
+        "transparent": 0x00FF00,
         "duration": Math.PI,
         "vertex":`
         #version 100
