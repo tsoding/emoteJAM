@@ -1,0 +1,23 @@
+body {
+    color: #ddd;
+    background-color: #222;
+}
+
+.progress {
+    background: #29c;
+}
+
+.spinning-wheel {
+    border-left: 20px solid #29c;
+}
+
+.github-corner {
+    fill: #ddd;
+    color: #222;
+}
+
+a {
+    color: #29c;
+    text-decoration: none;
+    border-bottom: #29c 0.0625em solid;
+}
