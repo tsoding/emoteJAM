@@ -17,7 +17,11 @@ $ python -m SimpleHTTPServer 6969
 $ iexplore.exe http://localhost:6969/
 ```
 
-## Filter Uniforms
+# Filter Development
+
+**WARNING! Knowledge of [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) or [OpenGL](https://www.opengl.org/) is required to read this section!**
+
+## Uniforms
 
 | Name | Description |
 | --- | --- |
