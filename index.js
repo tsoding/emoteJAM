@@ -72,7 +72,7 @@ void main() {
         ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
 
     gl_Position = vec4(
-        vec2(meshPosition.x * aspect, meshPosition.y) * scale + offset,
+        meshPosition * scale + offset,
         0.0,
         1.0);
 
