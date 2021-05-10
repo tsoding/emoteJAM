@@ -3,7 +3,6 @@ body {
     max-width: 650px;
     line-height: 1.6;
     font-size:18px;
-    color:#444;
     padding: 0 10px
 }
 
@@ -41,13 +40,11 @@ p {
 .progress {
     width: 0%;
     height: 20px;
-    background: #07a;
 }
 
 .spinning-wheel {
     width: 92px;
     height: 92px;
-    border-left: 20px solid #07a;
     border-right: 20px solid #00000000;
     border-top: 20px solid #00000000;
     border-bottom: 20px solid #00000000;
