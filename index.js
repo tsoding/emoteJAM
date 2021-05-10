@@ -49,6 +49,7 @@ precision mediump float;
 
 attribute vec2 meshPosition;
 uniform float time;
+uniform vec2 emoteSize;
 
 varying vec2 uv;
 
@@ -71,7 +72,7 @@ void main() {
         ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
 
     gl_Position = vec4(
-        meshPosition * scale + offset,
+        vec2(meshPosition.x * aspect, meshPosition.y) * scale + offset,
         0.0,
         1.0);
 
@@ -977,6 +978,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         "id": id,
         "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
         "timeUniform": gl.getUniformLocation(id, 'time'),
+        "emoteSizeUniform": gl.getUniformLocation(id, 'emoteSize'),
         "duration": filter.duration,
         "transparent": filter.transparent,
     };
@@ -1029,8 +1031,8 @@ window.onload = () => {
     let gif = undefined;
 
     // Bitmap Font
+    const customPreview = document.querySelector("#custom-preview");
     {
-        const customPreview = document.querySelector("#custom-preview");
         let emoteTexture = createTextureFromImage(gl, customPreview);
 
         customPreview.onload = function() {
@@ -1110,6 +1112,7 @@ window.onload = () => {
 
         gl.uniform1f(program.timeUniform, start * 0.001);
         gl.uniform2f(program.resolutionUniform, canvas.width, canvas.height);
+        gl.uniform2f(program.emoteSizeUniform, customPreview.width, customPreview.height);
 
         gl.clearColor(0.0, 1.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
