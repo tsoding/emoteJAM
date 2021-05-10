@@ -1049,15 +1049,70 @@ window.onload = () => {
         };
 
         // drag file from anywhere
-        document.ondrop = function(event) {
-            event.preventDefault();
-            customFile.files = event.dataTransfer.files;
-            customFile.onchange();
+        const dropFileZone = document.querySelector("#drop-file-zone");
+        let dragCounter = 0;
+
+        function showDropFileZone() {
+            dropFileZone.style.display = "flex";
         }
 
-        document.ondragover = function(event) {
-            event.preventDefault();
+        function hideDropFileZone() {
+            dropFileZone.style.display = "none";
         }
+
+        const scrollPosition = {
+            x: 0,
+            y: 0
+        };
+
+        function lockScroll() {
+            window.scroll(scrollPosition.x, scrollPosition.y);
+        }
+
+        window.addEventListener("dragenter", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            dragCounter++;
+            if(event.dataTransfer.items.length && event.dataTransfer.items[0].kind === "file") {
+                showDropFileZone();
+
+                scrollPosition.y = window.scrollY;
+                scrollPosition.x = window.scrollX;
+                window.addEventListener("scroll", lockScroll);
+            }
+        });
+
+        window.addEventListener("dragleave", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            dragCounter--;
+            if (dragCounter === 0) {
+                hideDropFileZone();
+                window.removeEventListener("scroll", lockScroll);
+            }
+        });
+
+        window.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        window.addEventListener("drop", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (event.dataTransfer.files.length) {
+                customFile.files = event.dataTransfer.files;
+                customFile.onchange();
+            }
+
+            dragCounter = 0;
+            hideDropFileZone();
+            window.removeEventListener("scroll", lockScroll);
+        });
+        
 
         const renderButton = document.querySelector("#render");
         renderButton.onclick = function() {

@@ -2,9 +2,34 @@ body {
     margin: 40px auto;
     max-width: 650px;
     line-height: 1.6;
-    font-size:18px;
-    color:#444;
-    padding: 0 10px
+    font-size: 18px;
+    color: #444;
+    padding: 0 10px;
+}
+
+.drop-file-zone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    background-color: #000000dd;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.drop-file-zone-inner-border {
+    width: 95%;
+    height: 95%;
+    border: dashed #07a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #eee;
+    text-align: center;
 }
 
 h1 {
