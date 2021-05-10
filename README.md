@@ -16,3 +16,12 @@ Nothing particularly special is required. Just serve the folder using HTTP serve
 $ python -m SimpleHTTPServer 6969
 $ iexplore.exe http://localhost:6969/
 ```
+
+## Filter Uniforms
+
+| Name | Description |
+| --- | --- |
+| `uniform float time` | Current time in Seconds (float) since the start of the application. Can be used for animating. |
+| `uniform vec2 resolution` | Resolution of the emote canvas in Pixels. |
+| `uniform sampler2D emote` | The input image as the WebGL texture. |
+| `uniform vec2 emoteSize` | The input image size in pixels. |
