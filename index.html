@@ -10,30 +10,18 @@
 
     <p>Welcome to emoteJAM &mdash; a simple website that generates animated <a href="https://betterttv.com/">BTTV</a> emotes from static images. Let's get started!</p>
 
-    <h2>TESTING</h2>
-
-    <div id="testing"></div>
-
     <h2>1. Select an Image</h2>
 
     <p>112x112 static images are prefered but you can try to select any image and see what happens. This does not upload the image anywhere. emoteJAM works entirely in your browser without any server behind it.</p>
 
-    <div class="widget">
-      <div class="widget-element"><input id="custom-file" type="file" /></div>
-      <img class="widget-element" id="custom-preview" src="tsodinClown.png" />
-    </div>
+    <div id="imageSelectorEntry"></div>
 
     <p>After you selected the image move on the next section to select a Filter!</p>
 
     <h2>2. Select a Filter</h2>
     <p>The image below is not a GIF yet. It's just a preview of how the filter looks like when applied to the image you've selected. Try different filters and pick the one you want.</p>
 
-    <div class="widget">
-      <div class="widget-element">
-        Filter: <select id="filters"></select>
-      </div>
-      <canvas id="preview" width="112" height="112" class="widget-element"></canvas>
-    </div>
+    <div id="filterSelectorEntry"></div>
 
     <p>Bright green color is going to be transparent when the actual final GIF is rendered. There is no way to change that yet (but we are working on it). If your image contains that color I'm deeply sorry!</p>
 
