@@ -1,3 +1,6 @@
+const vertexAttribs = {
+    "meshPosition": 0
+};
 const TRIANGLE_PAIR = 2;
 const TRIANGLE_VERTICIES = 3;
 const VEC2_COUNT = 2;
@@ -992,7 +995,192 @@ function removeFileNameExt(fileName) {
     }
 }
 
+function imageSelector() {
+    const imageInput = input().att$("type", "file");
+    const imagePreview = img("tsodinClown.png").att$("class", "widget-element");
+    const result = div(
+        div(imageInput).att$("class", "widget-element"),
+        imagePreview
+    ).att$("class", "widget");
+
+    result.selectedImage$ = function() {
+        return imagePreview;
+    };
+
+    imagePreview.addEventListener('load', function() {
+        result.dispatchEvent(new CustomEvent("imageSelected", {
+            detail: {
+                imageData: this
+            }
+        }));
+    });
+
+    imagePreview.addEventListener('error', function() {
+        imageInput.value = '';
+        this.src = 'error.png';
+    });
+
+    imageInput.addEventListener('change', function(event) {
+        imagePreview.src = URL.createObjectURL(this.files[0]);
+    });
+
+    // TODO: imageSelector component does not handle drag&drop
+
+    return result;
+}
+
+function filterList() {
+    const result = select();
+
+    // Populating the FilterList
+    for (let name in filters) {
+        result.add(new Option(name));
+    }
+
+    result.selectedFilter$ = function() {
+        return filters[result.selectedOptions[0].value];
+    };
+
+    result.onchange = function() {
+        result.dispatchEvent(new CustomEvent('filterChanged', {
+            detail: {
+                filter: result.selectedFilter$()
+            }
+        }));
+    };
+
+    result.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+            result.selectedIndex = Math.max(result.selectedIndex - 1, 0);
+        }
+        if (e.deltaY > 0) {
+            result.selectedIndex = Math.min(result.selectedIndex + 1, result.length - 1);
+        }
+        result.onchange();
+    });
+
+    return result;
+}
+
+function filterSelector(initialImageData) {
+    const filterList_ = filterList();
+    const filterPreview = canvas()
+          .att$("width", "112")
+          .att$("height", "112");
+    const result = div(
+        div(
+            "Filter: ", filterList_
+        ).att$("class", "widget-element"),
+        filterPreview.att$("class", "widget-element")
+    ).att$("class", "widget");
+
+    const gl = filterPreview.getContext("webgl", {antialias: false, alpha: false});
+    if (!gl) {
+        throw new Error("Could not initialize WebGL context");
+    }
+
+    // Initialize GL
+    {
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        // Mesh Position
+        {
+            let meshPositionBufferData = new Float32Array(TRIANGLE_PAIR * TRIANGLE_VERTICIES * VEC2_COUNT);
+            for (let triangle = 0; triangle < TRIANGLE_PAIR; ++triangle) {
+                for (let vertex = 0; vertex < TRIANGLE_VERTICIES; ++vertex) {
+                    const quad = triangle + vertex;
+                    const index =
+                          triangle * TRIANGLE_VERTICIES * VEC2_COUNT +
+                          vertex * VEC2_COUNT;
+                    meshPositionBufferData[index + VEC2_X] = (2 * (quad & 1) - 1);
+                    meshPositionBufferData[index + VEC2_Y] = (2 * ((quad >> 1) & 1) - 1);
+                }
+            }
+
+            let meshPositionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, meshPositionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, meshPositionBufferData, gl.STATIC_DRAW);
+
+            const meshPositionAttrib = vertexAttribs['meshPosition'];
+            gl.vertexAttribPointer(
+                meshPositionAttrib,
+                VEC2_COUNT,
+                gl.FLOAT,
+                false,
+                0,
+                0);
+            gl.enableVertexAttribArray(meshPositionAttrib);
+        }
+    }
+
+    let emoteImage = initialImageData;
+    let emoteTexture = createTextureFromImage(gl, emoteImage);
+    let program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs)
+
+    result.updateImage$ = function(newEmoteImage) {
+        emoteImage = newEmoteImage;
+        if (emoteTexture) {
+            gl.deleteTexture(emoteTexture);
+        }
+        emoteTexture = createTextureFromImage(gl, emoteImage);
+    };
+
+    filterList_.addEventListener('filterChanged', function(e) {
+        if (program) {
+            gl.deleteProgram(program.id);
+        }
+        program = loadFilterProgram(gl, e.detail.filter, vertexAttribs);
+    })
+
+    // Rendering Loop
+    {
+        let start;
+        function step(timestamp) {
+            if (start === undefined) {
+                start = timestamp;
+            }
+            const dt = (timestamp - start) * 0.001;
+            start = timestamp;
+
+            if (program) {
+                gl.uniform1f(program.timeUniform, start * 0.001);
+                gl.uniform2f(program.resolutionUniform, filterPreview.width, filterPreview.height);
+                if (emoteImage) {
+                    gl.uniform2f(program.emoteSizeUniform, emoteImage.width, emoteImage.height);
+                }
+            }
+
+            gl.clearColor(0.0, 1.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
+
+            window.requestAnimationFrame(step);
+        }
+        window.requestAnimationFrame(step);
+    }
+
+    return result;
+}
+
+function gifRenderer() {
+    
+}
+
 window.onload = () => {
+    // testing
+    {
+        const ejImageSelector = imageSelector();
+        const ejFilterSelector = filterSelector(ejImageSelector.selectedImage$());
+        ejImageSelector.addEventListener('imageSelected', function(e) {
+            ejFilterSelector.updateImage$(e.detail.imageData);
+        });
+        const entry = document.getElementById("testing");
+        entry.appendChild(div(ejImageSelector, ejFilterSelector));
+    }
+
     const filtersSelect = document.getElementById("filters");
     filtersSelect.addEventListener('wheel', function(e) {
         e.preventDefault();
@@ -1007,10 +1195,6 @@ window.onload = () => {
     for (let name in filters) {
         filtersSelect.add(new Option(name));
     }
-
-    const vertexAttribs = {
-        "meshPosition": 0
-    };
 
     const canvas = document.getElementById("preview");
     const gl = canvas.getContext("webgl", {antialias: false, alpha: false});
