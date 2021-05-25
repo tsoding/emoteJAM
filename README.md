@@ -13,7 +13,7 @@ Official Deployed Instance: [https://tsoding.org/emoteJAM/](https://tsoding.org/
 Nothing particularly special is required. Just serve the folder using HTTP server like Python's SimpleHTTPServer:
 
 ```console
-$ python -m SimpleHTTPServer 6969
+$ python3 -m http.server 6969
 $ iexplore.exe http://localhost:6969/
 ```
 
