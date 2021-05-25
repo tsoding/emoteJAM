@@ -911,14 +911,6 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
     };
 }
 
-function removeFileNameExt(fileName) {
-    if (fileName.includes('.')) {
-        return fileName.split('.').slice(0, -1).join('.');
-    } else {
-        return fileName;
-    }
-}
-
 function imageSelector() {
     const imageInput = input().att$("type", "file");
     const imagePreview = img("tsodinClown.png")
@@ -934,6 +926,14 @@ function imageSelector() {
     };
 
     result.selectedFileName$ = function() {
+        function removeFileNameExt(fileName) {
+            if (fileName.includes('.')) {
+                return fileName.split('.').slice(0, -1).join('.');
+            } else {
+                return fileName;
+            }
+        }
+
         const file = imageInput.files[0];
         return file ? removeFileNameExt(file.name) : 'result';
     };
