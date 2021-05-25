@@ -1049,7 +1049,7 @@ function FilterSelector() {
         }
     }
 
-    // TODO: FilterSelector does not handle loadFilterProgram() failures
+    // TODO(#49): FilterSelector does not handle loadFilterProgram() failures
 
     let emoteImage = undefined;
     let emoteTexture = undefined;
