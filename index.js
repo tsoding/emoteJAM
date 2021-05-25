@@ -9,24 +9,23 @@ const VEC2_Y = 1;
 const CANVAS_WIDTH = 112;
 const CANVAS_HEIGHT = 112;
 
-function shaderTypeToString(gl, shaderType) {
-    switch (shaderType) {
-    case gl.VERTEX_SHADER: return 'Vertex';
-    case gl.FRAGMENT_SHADER: return 'Fragment';
-    default: return shaderType;
-    }
-}
-
 function compileShaderSource(gl, source, shaderType) {
+    function shaderTypeToString() {
+        switch (shaderType) {
+        case gl.VERTEX_SHADER: return 'Vertex';
+        case gl.FRAGMENT_SHADER: return 'Fragment';
+        default: return shaderType;
+        }
+    }
+
     const shader = gl.createShader(shaderType);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error(`Could not compile ${shaderTypeToString(shaderType)} shader: ${gl.getShaderInfoLog(shader)}`);
+        throw new Error(`Could not compile ${shaderTypeToString()} shader: ${gl.getShaderInfoLog(shader)}`);
     }
     return shader;
 }
-
 
 function linkShaderProgram(gl, shaders, vertexAttribs) {
     const program = gl.createProgram();
@@ -1049,6 +1048,8 @@ function filterSelector() {
             gl.enableVertexAttribArray(meshPositionAttrib);
         }
     }
+
+    // TODO: FilterSelector does not handle loadFilterProgram() failures
 
     let emoteImage = undefined;
     let emoteTexture = undefined;
