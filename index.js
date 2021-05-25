@@ -1184,8 +1184,6 @@ window.onload = () => {
     filterSelectorEntry.appendChild(ejFilterSelector);
     imageSelectorEntry.appendChild(ejImageSelector);
 
-    let gif = undefined;
-
     // drag file from anywhere
     document.ondrop = function(event) {
         event.preventDefault();
@@ -1198,6 +1196,7 @@ window.onload = () => {
 
     // TODO: extract "renderer" as a separate grecha.js component
     // Similar to imageSelector and filterSelector
+    let gif = undefined;
     const renderButton = document.querySelector("#render");
     renderButton.onclick = function() {
         if (gif && gif.running) {
