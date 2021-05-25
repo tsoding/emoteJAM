@@ -913,7 +913,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
 
 function ImageSelector() {
     const imageInput = input().att$("type", "file");
-    const imagePreview = img("tsodinClown.png")
+    const imagePreview = img("img/tsodinClown.png")
           .att$("class", "widget-element")
           .att$("width", CANVAS_WIDTH);
     const root = div(
@@ -953,7 +953,7 @@ function ImageSelector() {
 
     imagePreview.addEventListener('error', function() {
         imageInput.value = '';
-        this.src = 'error.png';
+        this.src = 'img/error.png';
     });
 
     imageInput.onchange = function() {
