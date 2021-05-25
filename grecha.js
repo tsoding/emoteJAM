@@ -36,7 +36,6 @@ function input(type) {
     return tag("input").att$("type", type);
 }
 
-// TODO(#1): the router component should create the pages lazily
 function router(routes) {
     let result = div();
 
@@ -47,7 +46,6 @@ function router(routes) {
         }
 
         if (!(hashLocation in routes)) {
-            // TODO(#2): make the route404 customizable in the router component
             const route404 = '/404';
             console.assert(route404 in routes);
             hashLocation = route404;
@@ -62,7 +60,6 @@ function router(routes) {
     };
 
     syncHash();
-    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
     window.addEventListener("hashchange", syncHash);
 
     return result;
