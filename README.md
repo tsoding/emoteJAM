@@ -23,9 +23,9 @@ $ iexplore.exe http://localhost:6969/
 
 ## Uniforms
 
-| Name | Description |
+| Name | Type | Description |
 | --- | --- |
-| `uniform float time` | Current time in Seconds (float) since the start of the application. Can be used for animating. |
-| `uniform vec2 resolution` | Resolution of the emote canvas in Pixels. |
-| `uniform sampler2D emote` | The input image as the WebGL texture. |
-| `uniform vec2 emoteSize` | The input image size in pixels. |
+| `time` | `float` | Current time in Seconds (float) since the start of the application. Can be used for animating. |
+| `resolution` | `vec2` | Resolution of the emote canvas in Pixels. |
+| `emote` | `sampler2D` | The input image as the WebGL texture. |
+| `emoteSize` | `vec2` | The input image size in pixels. |
