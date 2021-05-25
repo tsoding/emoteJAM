@@ -1195,7 +1195,7 @@ window.onload = () => {
         event.preventDefault();
     }
 
-    // TODO: extract "renderer" as a separate grecha.js component
+    // TODO(#50): extract "renderer" as a separate grecha.js component
     // Similar to imageSelector and filterSelector
     let gif = undefined;
     const renderButton = document.querySelector("#render");
