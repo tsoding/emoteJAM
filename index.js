@@ -911,21 +911,21 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
     };
 }
 
-function imageSelector() {
+function ImageSelector() {
     const imageInput = input().att$("type", "file");
     const imagePreview = img("tsodinClown.png")
           .att$("class", "widget-element")
           .att$("width", CANVAS_WIDTH);
-    const result = div(
+    const root = div(
         div(imageInput).att$("class", "widget-element"),
         imagePreview
     ).att$("class", "widget");
 
-    result.selectedImage$ = function() {
+    root.selectedImage$ = function() {
         return imagePreview;
     };
 
-    result.selectedFileName$ = function() {
+    root.selectedFileName$ = function() {
         function removeFileNameExt(fileName) {
             if (fileName.includes('.')) {
                 return fileName.split('.').slice(0, -1).join('.');
@@ -938,13 +938,13 @@ function imageSelector() {
         return file ? removeFileNameExt(file.name) : 'result';
     };
 
-    result.updateFiles$ = function(files) {
+    root.updateFiles$ = function(files) {
         imageInput.files = files;
         imageInput.onchange();
     }
 
     imagePreview.addEventListener('load', function() {
-        result.dispatchEvent(new CustomEvent("imageSelected", {
+        root.dispatchEvent(new CustomEvent("imageSelected", {
             detail: {
                 imageData: this
             }
@@ -960,49 +960,49 @@ function imageSelector() {
         imagePreview.src = URL.createObjectURL(this.files[0]);
     };
 
-    return result;
+    return root;
 }
 
-function filterList() {
-    const result = select();
+function FilterList() {
+    const root = select();
 
     // Populating the FilterList
     for (let name in filters) {
-        result.add(new Option(name));
+        root.add(new Option(name));
     }
 
-    result.selectedFilter$ = function() {
-        return filters[result.selectedOptions[0].value];
+    root.selectedFilter$ = function() {
+        return filters[root.selectedOptions[0].value];
     };
 
-    result.onchange = function() {
-        result.dispatchEvent(new CustomEvent('filterChanged', {
+    root.onchange = function() {
+        root.dispatchEvent(new CustomEvent('filterChanged', {
             detail: {
-                filter: result.selectedFilter$()
+                filter: root.selectedFilter$()
             }
         }));
     };
 
-    result.addEventListener('wheel', function(e) {
+    root.addEventListener('wheel', function(e) {
         e.preventDefault();
         if (e.deltaY < 0) {
-            result.selectedIndex = Math.max(result.selectedIndex - 1, 0);
+            root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
         }
         if (e.deltaY > 0) {
-            result.selectedIndex = Math.min(result.selectedIndex + 1, result.length - 1);
+            root.selectedIndex = Math.min(root.selectedIndex + 1, root.length - 1);
         }
-        result.onchange();
+        root.onchange();
     });
 
-    return result;
+    return root;
 }
 
-function filterSelector() {
-    const filterList_ = filterList();
+function FilterSelector() {
+    const filterList_ = FilterList();
     const filterPreview = canvas()
           .att$("width", CANVAS_WIDTH)
           .att$("height", CANVAS_HEIGHT);
-    const result = div(
+    const root = div(
         div(
             "Filter: ", filterList_
         ).att$("class", "widget-element"),
@@ -1055,7 +1055,7 @@ function filterSelector() {
     let emoteTexture = undefined;
     let program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs);
 
-    result.updateImage$ = function(newEmoteImage) {
+    root.updateImage$ = function(newEmoteImage) {
         emoteImage = newEmoteImage;
         if (emoteTexture) {
             gl.deleteTexture(emoteTexture);
@@ -1070,7 +1070,7 @@ function filterSelector() {
         program = loadFilterProgram(gl, e.detail.filter, vertexAttribs);
     });
 
-    result.render$ = function (filename) {
+    root.render$ = function (filename) {
         var gif = new GIF({
             workers: 5,
             quality: 10,
@@ -1173,22 +1173,22 @@ function filterSelector() {
         window.requestAnimationFrame(step);
     }
 
-    return result;
+    return root;
 }
 
 window.onload = () => {
-    const ejImageSelector = imageSelector();
-    const ejFilterSelector = filterSelector();
-    ejImageSelector.addEventListener('imageSelected', function(e) {
-        ejFilterSelector.updateImage$(e.detail.imageData);
+    const imageSelector = ImageSelector();
+    const filterSelector = FilterSelector();
+    imageSelector.addEventListener('imageSelected', function(e) {
+        filterSelector.updateImage$(e.detail.imageData);
     });
-    filterSelectorEntry.appendChild(ejFilterSelector);
-    imageSelectorEntry.appendChild(ejImageSelector);
+    filterSelectorEntry.appendChild(filterSelector);
+    imageSelectorEntry.appendChild(imageSelector);
 
     // drag file from anywhere
     document.ondrop = function(event) {
         event.preventDefault();
-        ejImageSelector.updateFiles$(event.dataTransfer.files);
+        imageSelector.updateFiles$(event.dataTransfer.files);
     }
 
     document.ondragover = function(event) {
@@ -1203,7 +1203,7 @@ window.onload = () => {
         if (gif && gif.running) {
             gif.abort();
         }
-        const fileName = ejImageSelector.selectedFileName$();
-        gif = ejFilterSelector.render$(`${fileName}.gif`);
+        const fileName = imageSelector.selectedFileName$();
+        gif = filterSelector.render$(`${fileName}.gif`);
     };
 }
