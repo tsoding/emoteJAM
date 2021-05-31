@@ -44,6 +44,8 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
     return program;
 }
 
+// TODO: Filter params do not support expression in the strings
+
 const filters = {
     "Hop": {
         "transparent": 0x00FF00,
@@ -619,6 +621,29 @@ void main() {
     "Hard": {
         "transparent": 0x00FF00,
         "duration": 2.0 * Math.PI / 32.0,
+        "params": {
+            "zoom": {
+                "type": "float",
+                "init": 1.4,
+                "min": 0.0,
+                "max": 6.9,
+                "step": 0.1,
+            },
+            "intensity": {
+                "type": "float",
+                "init": 32.0,
+                "min": 0.0,
+                "max": 42.0,
+                "step": 1.0,
+            },
+            "amplitude": {
+                "type": "float",
+                "init": 1.0 / 8.0,
+                "min": 0.0,
+                "max": 1.0 / 2.0,
+                "step": 0.001,
+            },
+        },
         "vertex": `#version 100
 precision mediump float;
 
@@ -627,12 +652,13 @@ attribute vec2 meshPosition;
 uniform vec2 resolution;
 uniform float time;
 
+uniform float zoom;
+uniform float intensity;
+uniform float amplitude;
+
 varying vec2 uv;
 
 void main() {
-    float zoom = 1.4;
-    float intensity = 32.0;
-    float amplitude = 1.0 / 8.0;
     vec2 shaking = vec2(cos(intensity * time), sin(intensity * time)) * amplitude;
     gl_Position = vec4(meshPosition * zoom + shaking, 0.0, 1.0);
     uv = (meshPosition + 1.0) / 2.0;
@@ -894,6 +920,7 @@ function createTextureFromImage(gl, image) {
     return textureId;
 }
 
+// TODO: pre-load all of the filters and just switch between them without loading/unloading them constantly
 function loadFilterProgram(gl, filter, vertexAttribs) {
     let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
     let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
@@ -901,13 +928,81 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
     gl.useProgram(id);
+
+    let uniforms = {
+        "resolution": gl.getUniformLocation(id, 'resolution'),
+        "time": gl.getUniformLocation(id, 'time'),
+        "emoteSize": gl.getUniformLocation(id, 'emoteSize'),
+    };
+
+    // TODO: there no "reset to default" button in the params panel of a filter
+    let paramsPanel = div().att$("class", "widget-element");
+    let paramsInputs = {};
+
+    for (let paramName in filter.params) {
+        if (paramName in uniforms) {
+            throw new Error(`Redefinition of existing uniform parameter ${paramName}`);
+        }
+        
+        switch (filter.params[paramName].type) {
+        case "float": {
+            const valuePreview = span(filter.params[paramName].init.toString());
+            const valueInput = input("range");
+
+            if (filter.params[paramName].min) {
+                valueInput.att$("min", filter.params[paramName].min);
+            }
+
+            if (filter.params[paramName].max) {
+                valueInput.att$("max", filter.params[paramName].max);
+            }
+
+            if (filter.params[paramName].step) {
+                valueInput.att$("step", filter.params[paramName].step);
+            }
+
+            if (filter.params[paramName].init) {
+                valueInput.att$("value", filter.params[paramName].init);
+            }
+
+            paramsInputs[paramName] = valueInput;
+
+            valueInput.oninput = function () {
+                valuePreview.innerText = this.value;
+                paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
+            };
+
+            paramsPanel.appendChild(div(
+                span(`${paramName}: `), valuePreview,
+                div(valueInput),
+            ));
+        } break;
+
+        default: {
+            throw new Error(`Filter parameters do not support type ${filter.params[paramName].type}`)
+        }
+        }
+
+        uniforms[paramName] = gl.getUniformLocation(id, paramName);
+    }
+
+    paramsPanel.paramsSnapshot$ = function() {
+        let snapshot = {};
+        for (let paramName in paramsInputs) {
+            snapshot[paramName] = {
+                "uniform": uniforms[paramName],
+                "value": paramsInputs[paramName].value
+            };
+        }
+        return snapshot;
+    };
+
     return {
         "id": id,
-        "resolutionUniform": gl.getUniformLocation(id, 'resolution'),
-        "timeUniform": gl.getUniformLocation(id, 'time'),
-        "emoteSizeUniform": gl.getUniformLocation(id, 'emoteSize'),
+        "uniforms": uniforms,
         "duration": filter.duration,
         "transparent": filter.transparent,
+        "paramsPanel": paramsPanel,
     };
 }
 
@@ -1003,10 +1098,9 @@ function FilterSelector() {
           .att$("width", CANVAS_WIDTH)
           .att$("height", CANVAS_HEIGHT);
     const root = div(
-        div(
-            "Filter: ", filterList_
-        ).att$("class", "widget-element"),
-        filterPreview.att$("class", "widget-element")
+        div("Filter: ", filterList_)
+            .att$("class", "widget-element"),
+        filterPreview.att$("class", "widget-element"),
     ).att$("class", "widget");
 
     const gl = filterPreview.getContext("webgl", {antialias: false, alpha: false});
@@ -1053,7 +1147,21 @@ function FilterSelector() {
 
     let emoteImage = undefined;
     let emoteTexture = undefined;
-    let program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs);
+    let program = undefined;
+
+    function syncParams() {
+        if (program) {
+            const snapshot = program.paramsPanel.paramsSnapshot$();
+            for (let paramName in snapshot) {
+                gl.uniform1f(snapshot[paramName].uniform, snapshot[paramName].value);
+            }
+        }
+    }
+
+    program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs);
+    program.paramsPanel.addEventListener('paramsChanged', syncParams);
+    root.appendChild(program.paramsPanel);
+    syncParams();
 
     root.updateImage$ = function(newEmoteImage) {
         emoteImage = newEmoteImage;
@@ -1066,8 +1174,14 @@ function FilterSelector() {
     filterList_.addEventListener('filterChanged', function(e) {
         if (program) {
             gl.deleteProgram(program.id);
+            program.paramsPanel.removeEventListener('paramsChanged', syncParams);
+            root.removeChild(program.paramsPanel);
         }
+
         program = loadFilterProgram(gl, e.detail.filter, vertexAttribs);
+        program.paramsPanel.addEventListener('paramsChanged', syncParams);
+        root.appendChild(program.paramsPanel);
+        syncParams();
     });
 
     root.render$ = function (filename) {
@@ -1094,8 +1208,10 @@ function FilterSelector() {
 
         let t = 0.0;
         while (t <= duration) {
-            gl.uniform1f(program.timeUniform, t);
-            gl.uniform2f(program.resolutionUniform, CANVAS_WIDTH, CANVAS_HEIGHT);
+            gl.uniform1f(program.uniforms.time, t);
+            gl.uniform2f(program.uniforms.resolution, CANVAS_WIDTH, CANVAS_HEIGHT);
+            gl.uniform2f(program.uniforms.emoteSize, emoteImage.width, emoteImage.height);
+
             gl.clearColor(0.0, 1.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
@@ -1161,9 +1277,9 @@ function FilterSelector() {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             if (program && emoteImage) {
-                gl.uniform1f(program.timeUniform, start * 0.001);
-                gl.uniform2f(program.resolutionUniform, filterPreview.width, filterPreview.height);
-                gl.uniform2f(program.emoteSizeUniform, emoteImage.width, emoteImage.height);
+                gl.uniform1f(program.uniforms.time, start * 0.001);
+                gl.uniform2f(program.uniforms.resolution, filterPreview.width, filterPreview.height);
+                gl.uniform2f(program.uniforms.emoteSize, emoteImage.width, emoteImage.height);
 
                 gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
             }
