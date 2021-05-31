@@ -46,7 +46,7 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
     return program;
 }
 
-// TODO: Filter params do not support expression in the strings
+// TODO(#53): Filter params do not support expression in the strings
 
 const filters = {
     "Hop": {
