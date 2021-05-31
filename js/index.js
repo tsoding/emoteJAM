@@ -1,3 +1,5 @@
+let feature_params = false; 
+
 const vertexAttribs = {
     "meshPosition": 0
 };
@@ -1160,7 +1162,9 @@ function FilterSelector() {
 
     program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs);
     program.paramsPanel.addEventListener('paramsChanged', syncParams);
-    root.appendChild(program.paramsPanel);
+    if (feature_params) {
+        root.appendChild(program.paramsPanel);
+    }
     syncParams();
 
     root.updateImage$ = function(newEmoteImage) {
@@ -1175,12 +1179,16 @@ function FilterSelector() {
         if (program) {
             gl.deleteProgram(program.id);
             program.paramsPanel.removeEventListener('paramsChanged', syncParams);
-            root.removeChild(program.paramsPanel);
+            if (feature_params) {
+                root.removeChild(program.paramsPanel);
+            }
         }
 
         program = loadFilterProgram(gl, e.detail.filter, vertexAttribs);
         program.paramsPanel.addEventListener('paramsChanged', syncParams);
-        root.appendChild(program.paramsPanel);
+        if (feature_params) {
+            root.appendChild(program.paramsPanel);
+        }
         syncParams();
     });
 
@@ -1293,6 +1301,8 @@ function FilterSelector() {
 }
 
 window.onload = () => {
+    feature_params = new URLSearchParams(document.location.search).has("feature-params");
+
     const imageSelector = ImageSelector();
     const filterSelector = FilterSelector();
     imageSelector.addEventListener('imageSelected', function(e) {
