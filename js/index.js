@@ -922,7 +922,7 @@ function createTextureFromImage(gl, image) {
     return textureId;
 }
 
-// TODO: pre-load all of the filters and just switch between them without loading/unloading them constantly
+// TODO(#54): pre-load all of the filters and just switch between them without loading/unloading them constantly
 function loadFilterProgram(gl, filter, vertexAttribs) {
     let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
     let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
