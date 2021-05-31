@@ -937,7 +937,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         "emoteSize": gl.getUniformLocation(id, 'emoteSize'),
     };
 
-    // TODO: there no "reset to default" button in the params panel of a filter
+    // TODO(#55): there no "reset to default" button in the params panel of a filter
     let paramsPanel = div().att$("class", "widget-element");
     let paramsInputs = {};
 
