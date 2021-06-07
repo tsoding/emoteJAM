@@ -586,7 +586,7 @@ void main() {
             "intensity": {
                 "type": "float",
                 "init": 32.0,
-                "min": 0.0,
+                "min": 1.0,
                 "max": 42.0,
                 "step": 1.0,
             },
