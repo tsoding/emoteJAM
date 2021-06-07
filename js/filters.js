@@ -214,7 +214,23 @@ void main() {
     },
     "Bounce": {
         "transparent": 0x00FF00,
-        "duration": "Math.PI / 5.0",
+        "duration": "Math.PI / period",
+        "params": {
+            "period": {
+                "type": "float",
+                "init": 5.0,
+                "min": 1.0,
+                "max": 10.0,
+                "step": 0.1,
+            },
+            "scale": {
+                "type": "float",
+                "init": 0.30,
+                "min": 0.0,
+                "max": 1.0,
+                "step": 0.01,
+            }
+        },
         "vertex": `#version 100
 precision mediump float;
 
@@ -223,12 +239,13 @@ attribute vec2 meshPosition;
 uniform vec2 resolution;
 uniform float time;
 
+uniform float period;
+uniform float scale;
+
 varying vec2 uv;
 
 void main() {
-    float scale = 0.30;
-    float period_interval = 5.0;
-    vec2 offset = vec2(0.0, (2.0 * abs(sin(time * period_interval)) - 1.0) * (1.0 - scale));
+    vec2 offset = vec2(0.0, (2.0 * abs(sin(time * period)) - 1.0) * (1.0 - scale));
     gl_Position = vec4(meshPosition * scale + offset, 0.0, 1.0);
     uv = (meshPosition + 1.0) / 2.0;
 }
