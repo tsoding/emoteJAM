@@ -1,4 +1,4 @@
-// TODO: add params to all of the filters
+// TODO(#58): add params to all of the filters
 const filters = {
     "Hop": {
         "transparent": 0x00FF00,
