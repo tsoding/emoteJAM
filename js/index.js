@@ -118,8 +118,13 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
                 paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
             };
 
+            let label = paramName;
+            if (filter.params[paramName].label) {
+                label = filter.params[paramName].label;
+            }
+
             paramsPanel.appendChild(div(
-                span(`${paramName}: `), valuePreview,
+                span(`${label}: `), valuePreview,
                 div(valueInput),
             ));
         } break;

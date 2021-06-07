@@ -6,7 +6,9 @@ const filters = {
         "duration": "interval * 2",
         // TODO(#62): when you have too many params the UI gets really cluttered
         "params": {
+            // TODO(#65): filter params should have help tooltips associated with them
             "interval": {
+                "label": "Interval",
                 "type": "float",
                 "init": 0.85,
                 "min": 0.01,
@@ -14,6 +16,7 @@ const filters = {
                 "step": 0.01,
             },
             "ground": {
+                "label": "Ground",
                 "type": "float",
                 "init": 0.5,
                 "min": -1.0,
@@ -21,6 +24,7 @@ const filters = {
                 "step": 0.01,
             },
             "scale": {
+                "label": "Scale",
                 "type": "float",
                 "init": 0.40,
                 "min": 0.0,
@@ -30,6 +34,7 @@ const filters = {
             // TODO(#63): jump_height in the "Hop" filter does not make any sense
             // If it's bigger the emote should jump higher. Right now it is the other way around.
             "jump_height": {
+                "label": "Jump Height",
                 "type": "float",
                 "init": 4.0,
                 "min": 1.0,
@@ -37,6 +42,7 @@ const filters = {
                 "step": 0.01,
             },
             "hops": {
+                "label": "Hops Count",
                 "type": "float",
                 "init": 2.0,
                 "min": 1.0,
