@@ -146,7 +146,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
     return {
         "id": id,
         "uniforms": uniforms,
-        "duration": filter.duration,
+        "duration": compile_expr(filter.duration),
         "transparent": filter.transparent,
         "paramsPanel": paramsPanel,
     };
@@ -345,9 +345,24 @@ function FilterSelector() {
             transparent: program.transparent,
         });
 
+        const context = {
+            "vars": {
+                "Math.PI": Math.PI
+            }
+        };
+        {
+            console.assert(program);
+            const snapshot = program.paramsPanel.paramsSnapshot$();
+            console.log(snapshot);
+            for (let paramName in snapshot) {
+                context.vars[paramName] = snapshot[paramName].value;
+            }
+        }
+
         const fps = 30;
         const dt = 1.0 / fps;
-        const duration = program.duration;
+        // TODO: come up with a reasonable way to handle malicious durations
+        const duration = Math.min(run_expr(program.duration, context), 60);
         const frameCount = 100;
 
         const renderProgress = document.getElementById("render-progress");
