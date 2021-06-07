@@ -4,6 +4,7 @@ const filters = {
     "Hop": {
         "transparent": 0x00FF00,
         "duration": "interval * 2",
+        // TODO: when you have too many params the UI gets really cluttered
         "params": {
             "interval": {
                 "type": "float",
