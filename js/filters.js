@@ -27,7 +27,7 @@ const filters = {
                 "max": 1.0,
                 "step": 0.01,
             },
-            // TODO: jump_height in the "Hop" filter does not make any sense
+            // TODO(#63): jump_height in the "Hop" filter does not make any sense
             // If it's bigger the emote should jump higher. Right now it is the other way around.
             "jump_height": {
                 "type": "float",
