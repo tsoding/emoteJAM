@@ -1,5 +1,4 @@
-// TODO(#53): Filter params do not support expression in the strings
-
+// TODO: add params to all of the filters
 const filters = {
     "Hop": {
         "transparent": 0x00FF00,
