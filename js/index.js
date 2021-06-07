@@ -361,7 +361,7 @@ function FilterSelector() {
 
         const fps = 30;
         const dt = 1.0 / fps;
-        // TODO: come up with a reasonable way to handle malicious durations
+        // TODO(#59): come up with a reasonable way to handle malicious durations
         const duration = Math.min(run_expr(program.duration, context), 60);
         const frameCount = 100;
 
