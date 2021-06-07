@@ -6,6 +6,7 @@ const filters = {
         "duration": "interval * 2",
         // TODO(#62): when you have too many params the UI gets really cluttered
         "params": {
+            // TODO: filter params should have help tooltips associated with them
             "interval": {
                 "label": "Interval",
                 "type": "float",
