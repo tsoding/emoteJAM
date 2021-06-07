@@ -353,7 +353,6 @@ function FilterSelector() {
         {
             console.assert(program);
             const snapshot = program.paramsPanel.paramsSnapshot$();
-            console.log(snapshot);
             for (let paramName in snapshot) {
                 context.vars[paramName] = snapshot[paramName].value;
             }
