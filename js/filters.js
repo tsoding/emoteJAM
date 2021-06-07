@@ -1,5 +1,5 @@
 // TODO(#58): add params to all of the filters
-// TODO: human readable titles for the filter params
+// TODO(#61): human readable titles for the filter params
 const filters = {
     "Hop": {
         "transparent": 0x00FF00,
