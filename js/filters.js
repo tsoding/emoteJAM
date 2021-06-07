@@ -1,14 +1,61 @@
 // TODO(#58): add params to all of the filters
+// TODO(#61): human readable titles for the filter params
 const filters = {
     "Hop": {
         "transparent": 0x00FF00,
-        "duration": "0.85 * 2",
+        "duration": "interval * 2",
+        // TODO(#62): when you have too many params the UI gets really cluttered
+        "params": {
+            "interval": {
+                "type": "float",
+                "init": 0.85,
+                "min": 0.01,
+                "max": 2.00,
+                "step": 0.01,
+            },
+            "ground": {
+                "type": "float",
+                "init": 0.5,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.01,
+            },
+            "scale": {
+                "type": "float",
+                "init": 0.40,
+                "min": 0.0,
+                "max": 1.0,
+                "step": 0.01,
+            },
+            // TODO(#63): jump_height in the "Hop" filter does not make any sense
+            // If it's bigger the emote should jump higher. Right now it is the other way around.
+            "jump_height": {
+                "type": "float",
+                "init": 4.0,
+                "min": 1.0,
+                "max": 10.0,
+                "step": 0.01,
+            },
+            "hops": {
+                "type": "float",
+                "init": 2.0,
+                "min": 1.0,
+                "max": 5.0,
+                "step": 1.0,
+            }
+        },
         "vertex": `#version 100
 precision mediump float;
 
 attribute vec2 meshPosition;
 uniform float time;
 uniform vec2 emoteSize;
+
+uniform float interval;
+uniform float ground;
+uniform float scale;
+uniform float jump_height;
+uniform float hops;
 
 varying vec2 uv;
 
@@ -21,14 +68,11 @@ float flipping_directions(float time_interval) {
 }
 
 void main() {
-    float scale = 0.40;
-    float hops = 2.0;
-    float x_time_interval = 0.85;
+    float x_time_interval = interval;
     float y_time_interval = x_time_interval / (2.0 * hops);
-    float height = 0.5;
     vec2 offset = vec2(
         sliding_from_left_to_right(x_time_interval) * flipping_directions(x_time_interval) * (1.0 - scale),
-        ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / 4.0) - height);
+        ((sliding_from_left_to_right(y_time_interval) * flipping_directions(y_time_interval) + 1.0) / jump_height) - ground);
 
     gl_Position = vec4(
         meshPosition * scale + offset,
@@ -171,7 +215,23 @@ void main() {
     },
     "Bounce": {
         "transparent": 0x00FF00,
-        "duration": "Math.PI / 5.0",
+        "duration": "Math.PI / period",
+        "params": {
+            "period": {
+                "type": "float",
+                "init": 5.0,
+                "min": 1.0,
+                "max": 10.0,
+                "step": 0.1,
+            },
+            "scale": {
+                "type": "float",
+                "init": 0.30,
+                "min": 0.0,
+                "max": 1.0,
+                "step": 0.01,
+            }
+        },
         "vertex": `#version 100
 precision mediump float;
 
@@ -180,12 +240,13 @@ attribute vec2 meshPosition;
 uniform vec2 resolution;
 uniform float time;
 
+uniform float period;
+uniform float scale;
+
 varying vec2 uv;
 
 void main() {
-    float scale = 0.30;
-    float period_interval = 5.0;
-    vec2 offset = vec2(0.0, (2.0 * abs(sin(time * period_interval)) - 1.0) * (1.0 - scale));
+    vec2 offset = vec2(0.0, (2.0 * abs(sin(time * period)) - 1.0) * (1.0 - scale));
     gl_Position = vec4(meshPosition * scale + offset, 0.0, 1.0);
     uv = (meshPosition + 1.0) / 2.0;
 }
