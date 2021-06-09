@@ -142,7 +142,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         for (let paramName in paramsInputs) {
             snapshot[paramName] = {
                 "uniform": uniforms[paramName],
-                "value": paramsInputs[paramName].value
+                "value": parseFloat(paramsInputs[paramName].value)
             };
         }
         return snapshot;
