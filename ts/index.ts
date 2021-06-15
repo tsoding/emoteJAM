@@ -1,130 +1,178 @@
-"use strict";
-var feature_params = false;
-var vertexAttribs = {
+let feature_params = false; 
+
+interface VertexAttribs {
+    [name: string]: number
+}
+
+const vertexAttribs: VertexAttribs = {
     "meshPosition": 0
 };
-var TRIANGLE_PAIR = 2;
-var TRIANGLE_VERTICIES = 3;
-var VEC2_COUNT = 2;
-var VEC2_X = 0;
-var VEC2_Y = 1;
-var CANVAS_WIDTH = 112;
-var CANVAS_HEIGHT = 112;
-function compileShaderSource(gl, source, shaderType) {
+const TRIANGLE_PAIR = 2;
+const TRIANGLE_VERTICIES = 3;
+const VEC2_COUNT = 2;
+const VEC2_X = 0;
+const VEC2_Y = 1;
+const CANVAS_WIDTH = 112;
+const CANVAS_HEIGHT = 112;
+
+function compileShaderSource(gl: WebGLRenderingContext, source: string, shaderType: GLenum): WebGLShader {
     function shaderTypeToString() {
         switch (shaderType) {
-            case gl.VERTEX_SHADER: return 'Vertex';
-            case gl.FRAGMENT_SHADER: return 'Fragment';
-            default: return shaderType;
+        case gl.VERTEX_SHADER: return 'Vertex';
+        case gl.FRAGMENT_SHADER: return 'Fragment';
+        default: return shaderType;
         }
     }
-    var shader = gl.createShader(shaderType);
+
+    const shader = gl.createShader(shaderType);
     if (shader === null) {
-        throw new Error("Could not create a new shader");
+        throw new Error(`Could not create a new shader`);
     }
+
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error("Could not compile " + shaderTypeToString() + " shader: " + gl.getShaderInfoLog(shader));
+        throw new Error(`Could not compile ${shaderTypeToString()} shader: ${gl.getShaderInfoLog(shader)}`);
     }
     return shader;
 }
-function linkShaderProgram(gl, shaders, vertexAttribs) {
-    var program = gl.createProgram();
+
+function linkShaderProgram(gl: WebGLRenderingContext, shaders: WebGLShader[], vertexAttribs: VertexAttribs): WebGLProgram {
+    const program = gl.createProgram();
     if (program === null) {
         throw new Error('Could not create a new shader program');
     }
-    for (var _i = 0, shaders_1 = shaders; _i < shaders_1.length; _i++) {
-        var shader = shaders_1[_i];
+
+    for (let shader of shaders) {
         gl.attachShader(program, shader);
     }
-    for (var vertexName in vertexAttribs) {
+
+    for (let vertexName in vertexAttribs) {
         gl.bindAttribLocation(program, vertexAttribs[vertexName], vertexName);
     }
+
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error("Could not link shader program: " + gl.getProgramInfoLog(program));
+        throw new Error(`Could not link shader program: ${gl.getProgramInfoLog(program)}`);
     }
     return program;
 }
-function createTextureFromImage(gl, image) {
-    var textureId = gl.createTexture();
+
+function createTextureFromImage(gl: WebGLRenderingContext, image: TexImageSource): WebGLTexture {
+    let textureId = gl.createTexture();
     if (textureId === null) {
         throw new Error('Could not create a new WebGL texture');
     }
+
     gl.bindTexture(gl.TEXTURE_2D, textureId);
-    gl.texImage2D(gl.TEXTURE_2D, // target
-    0, // level
-    gl.RGBA, // internalFormat
-    gl.RGBA, // srcFormat
-    gl.UNSIGNED_BYTE, // srcType
-    image // image
+    gl.texImage2D(
+        gl.TEXTURE_2D,    // target
+        0,                // level
+        gl.RGBA,          // internalFormat
+        gl.RGBA,          // srcFormat
+        gl.UNSIGNED_BYTE, // srcType
+        image             // image
     );
+
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
     return textureId;
 }
+
+interface Uniforms {
+    [name: string]: WebGLUniformLocation | null
+}
+
+interface CompiledFilter {
+    id: WebGLProgram,
+    uniforms: Uniforms,
+    duration: Expr,
+    transparent: string | null,
+    paramsPanel: Tag
+}
+
+interface Snapshot {
+    [name: string]: {
+        uniform: WebGLUniformLocation | null,
+        value: number | null
+    }
+}
+
 // TODO(#54): pre-load all of the filters and just switch between them without loading/unloading them constantly
-function loadFilterProgram(gl, filter, vertexAttribs) {
-    var _a;
-    var vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
-    var fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
-    var id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
+function loadFilterProgram(gl: WebGLRenderingContext, filter: Filter, vertexAttribs: VertexAttribs): CompiledFilter {
+    let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
+    let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
+    let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
     gl.useProgram(id);
-    var uniforms = {
+
+    let uniforms: Uniforms = {
         "resolution": gl.getUniformLocation(id, 'resolution'),
         "time": gl.getUniformLocation(id, 'time'),
         "emoteSize": gl.getUniformLocation(id, 'emoteSize'),
     };
+
     // TODO(#55): there no "reset to default" button in the params panel of a filter
-    var paramsPanel = div().att$("class", "widget-element");
-    var paramsInputs = {};
-    var _loop_1 = function (paramName) {
+    let paramsPanel = div().att$("class", "widget-element");
+    let paramsInputs: {[name: string]: Tag} = {};
+
+    for (let paramName in filter.params) {
         if (paramName in uniforms) {
-            throw new Error("Redefinition of existing uniform parameter " + paramName);
+            throw new Error(`Redefinition of existing uniform parameter ${paramName}`);
         }
+        
         switch (filter.params[paramName].type) {
-            case "float":
-                {
-                    var valuePreview_1 = span(filter.params[paramName].init.toString());
-                    var valueInput = input("range");
-                    if (filter.params[paramName].min) {
-                        valueInput.att$("min", filter.params[paramName].min);
-                    }
-                    if (filter.params[paramName].max) {
-                        valueInput.att$("max", filter.params[paramName].max);
-                    }
-                    if (filter.params[paramName].step) {
-                        valueInput.att$("step", filter.params[paramName].step);
-                    }
-                    if (filter.params[paramName].init) {
-                        valueInput.att$("value", filter.params[paramName].init);
-                    }
-                    paramsInputs[paramName] = valueInput;
-                    valueInput.oninput = function () {
-                        valuePreview_1.innerText = this.value;
-                        paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
-                    };
-                    var label = (_a = filter.params[paramName].label) !== null && _a !== void 0 ? _a : paramName;
-                    paramsPanel.appendChild(div(span(label + ": "), valuePreview_1, div(valueInput)));
-                }
-                break;
-            default: {
-                throw new Error("Filter parameters do not support type " + filter.params[paramName].type);
+        case "float": {
+            const valuePreview = span(filter.params[paramName].init.toString());
+            const valueInput = input("range");
+
+            if (filter.params[paramName].min) {
+                valueInput.att$("min", filter.params[paramName].min);
             }
+
+            if (filter.params[paramName].max) {
+                valueInput.att$("max", filter.params[paramName].max);
+            }
+
+            if (filter.params[paramName].step) {
+                valueInput.att$("step", filter.params[paramName].step);
+            }
+
+            if (filter.params[paramName].init) {
+                valueInput.att$("value", filter.params[paramName].init);
+            }
+
+            paramsInputs[paramName] = valueInput;
+
+            valueInput.oninput = function () {
+                valuePreview.innerText = this.value;
+                paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
+            };
+
+            const label: string = filter.params[paramName].label ?? paramName;
+
+            paramsPanel.appendChild(div(
+                span(`${label}: `), valuePreview,
+                div(valueInput),
+            ));
+        } break;
+
+        default: {
+            throw new Error(`Filter parameters do not support type ${filter.params[paramName].type}`)
         }
+        }
+
         uniforms[paramName] = gl.getUniformLocation(id, paramName);
-    };
-    for (var paramName in filter.params) {
-        _loop_1(paramName);
     }
-    paramsPanel.paramsSnapshot$ = function () {
-        var snapshot = {};
-        for (var paramName in paramsInputs) {
+
+
+    paramsPanel.paramsSnapshot$ = function() {
+        let snapshot: Snapshot = {};
+        for (let paramName in paramsInputs) {
             snapshot[paramName] = {
                 "uniform": uniforms[paramName],
                 "value": paramsInputs[paramName].value
@@ -132,6 +180,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         }
         return snapshot;
     };
+
     return {
         "id": id,
         "uniforms": uniforms,
@@ -140,64 +189,80 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         "paramsPanel": paramsPanel,
     };
 }
+
 function ImageSelector() {
-    var imageInput = input("file");
-    var imagePreview = img("img/tsodinClown.png")
-        .att$("class", "widget-element")
-        .att$("width", CANVAS_WIDTH);
-    var root = div(div(imageInput).att$("class", "widget-element"), imagePreview).att$("class", "widget");
-    root.selectedImage$ = function () {
+    const imageInput = input("file");
+    const imagePreview = img("img/tsodinClown.png")
+          .att$("class", "widget-element")
+          .att$("width", CANVAS_WIDTH);
+    const root = div(
+        div(imageInput).att$("class", "widget-element"),
+        imagePreview
+    ).att$("class", "widget");
+
+    root.selectedImage$ = function() {
         return imagePreview;
     };
-    root.selectedFileName$ = function () {
-        function removeFileNameExt(fileName) {
+
+    root.selectedFileName$ = function() {
+        function removeFileNameExt(fileName: string): string {
             if (fileName.includes('.')) {
                 return fileName.split('.').slice(0, -1).join('.');
-            }
-            else {
+            } else {
                 return fileName;
             }
         }
-        var file = imageInput.files[0];
+
+        const file = imageInput.files[0];
         return file ? removeFileNameExt(file.name) : 'result';
     };
-    root.updateFiles$ = function (files) {
+
+    root.updateFiles$ = function(files: FileList) {
         imageInput.files = files;
         imageInput.onchange();
-    };
-    imagePreview.addEventListener('load', function () {
+    }
+
+    imagePreview.addEventListener('load', function(this: HTMLImageElement) {
         root.dispatchEvent(new CustomEvent("imageSelected", {
             detail: {
                 imageData: this
             }
         }));
     });
-    imagePreview.addEventListener('error', function () {
+
+    imagePreview.addEventListener('error', function(this: HTMLImageElement) {
         imageInput.value = '';
         this.src = 'img/error.png';
     });
-    imageInput.onchange = function () {
+
+    imageInput.onchange = function() {
         imagePreview.src = URL.createObjectURL(this.files[0]);
     };
+
     return root;
 }
+
 function FilterList() {
-    var root = select();
+    const root = select();
+
     // Populating the FilterList
-    for (var name_1 in filters) {
-        root.add(new Option(name_1));
+    for (let name in filters) {
+        root.add(new Option(name));
     }
-    root.selectedFilter$ = function () {
+
+    root.selectedFilter$ = function() {
         return filters[root.selectedOptions[0].value];
     };
-    root.onchange = function () {
+
+    root.onchange = function() {
         root.dispatchEvent(new CustomEvent('filterChanged', {
             detail: {
                 filter: root.selectedFilter$()
             }
         }));
     };
-    root.addEventListener('wheel', function (e) {
+
+    root.addEventListener('wheel', function(e: WheelEvent) {
         e.preventDefault();
         if (e.deltaY < 0) {
             root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
@@ -207,69 +272,92 @@ function FilterList() {
         }
         root.onchange();
     });
+
     return root;
 }
+
 function FilterSelector() {
-    var filterList_ = FilterList();
-    var filterPreview = canvas()
-        .att$("width", CANVAS_WIDTH)
-        .att$("height", CANVAS_HEIGHT);
-    var root = div(div("Filter: ", filterList_)
-        .att$("class", "widget-element"), filterPreview.att$("class", "widget-element")).att$("class", "widget");
-    var gl = filterPreview.getContext("webgl", { antialias: false, alpha: false });
+    const filterList_ = FilterList();
+    const filterPreview = canvas()
+          .att$("width", CANVAS_WIDTH)
+          .att$("height", CANVAS_HEIGHT);
+    const root = div(
+        div("Filter: ", filterList_)
+            .att$("class", "widget-element"),
+        filterPreview.att$("class", "widget-element"),
+    ).att$("class", "widget");
+
+    const gl = filterPreview.getContext("webgl", {antialias: false, alpha: false});
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
     }
+
     // Initialize GL
     {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
         // Mesh Position
         {
-            var meshPositionBufferData = new Float32Array(TRIANGLE_PAIR * TRIANGLE_VERTICIES * VEC2_COUNT);
-            for (var triangle = 0; triangle < TRIANGLE_PAIR; ++triangle) {
-                for (var vertex = 0; vertex < TRIANGLE_VERTICIES; ++vertex) {
-                    var quad = triangle + vertex;
-                    var index = triangle * TRIANGLE_VERTICIES * VEC2_COUNT +
-                        vertex * VEC2_COUNT;
+            let meshPositionBufferData = new Float32Array(TRIANGLE_PAIR * TRIANGLE_VERTICIES * VEC2_COUNT);
+            for (let triangle = 0; triangle < TRIANGLE_PAIR; ++triangle) {
+                for (let vertex = 0; vertex < TRIANGLE_VERTICIES; ++vertex) {
+                    const quad = triangle + vertex;
+                    const index =
+                          triangle * TRIANGLE_VERTICIES * VEC2_COUNT +
+                          vertex * VEC2_COUNT;
                     meshPositionBufferData[index + VEC2_X] = (2 * (quad & 1) - 1);
                     meshPositionBufferData[index + VEC2_Y] = (2 * ((quad >> 1) & 1) - 1);
                 }
             }
-            var meshPositionBuffer = gl.createBuffer();
+
+            let meshPositionBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, meshPositionBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, meshPositionBufferData, gl.STATIC_DRAW);
-            var meshPositionAttrib = vertexAttribs['meshPosition'];
-            gl.vertexAttribPointer(meshPositionAttrib, VEC2_COUNT, gl.FLOAT, false, 0, 0);
+
+            const meshPositionAttrib = vertexAttribs['meshPosition'];
+            gl.vertexAttribPointer(
+                meshPositionAttrib,
+                VEC2_COUNT,
+                gl.FLOAT,
+                false,
+                0,
+                0);
             gl.enableVertexAttribArray(meshPositionAttrib);
         }
     }
+
     // TODO(#49): FilterSelector does not handle loadFilterProgram() failures
-    var emoteImage = undefined;
-    var emoteTexture = undefined;
-    var program = undefined;
+
+    let emoteImage: HTMLImageElement | undefined = undefined;
+    let emoteTexture: WebGLTexture | undefined = undefined;
+    let program: CompiledFilter | undefined = undefined;
+
     function syncParams() {
         if (program) {
-            var snapshot = program.paramsPanel.paramsSnapshot$();
-            for (var paramName in snapshot) {
+            const snapshot = program.paramsPanel.paramsSnapshot$();
+            for (let paramName in snapshot) {
                 gl.uniform1f(snapshot[paramName].uniform, snapshot[paramName].value);
             }
         }
     }
+
     program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs);
     program.paramsPanel.addEventListener('paramsChanged', syncParams);
     if (feature_params) {
         root.appendChild(program.paramsPanel);
     }
     syncParams();
-    root.updateImage$ = function (newEmoteImage) {
+
+    root.updateImage$ = function(newEmoteImage: HTMLImageElement) {
         emoteImage = newEmoteImage;
         if (emoteTexture) {
             gl.deleteTexture(emoteTexture);
         }
         emoteTexture = createTextureFromImage(gl, emoteImage);
     };
-    filterList_.addEventListener('filterChanged', function (e) {
+
+    filterList_.addEventListener('filterChanged', function(e: any) {
         if (program) {
             gl.deleteProgram(program.id);
             program.paramsPanel.removeEventListener('paramsChanged', syncParams);
@@ -277,6 +365,7 @@ function FilterSelector() {
                 root.removeChild(program.paramsPanel);
             }
         }
+
         program = loadFilterProgram(gl, e.detail.filter, vertexAttribs);
         program.paramsPanel.addEventListener('paramsChanged', syncParams);
         if (feature_params) {
@@ -284,156 +373,185 @@ function FilterSelector() {
         }
         syncParams();
     });
-    root.render$ = function (filename) {
+
+    root.render$ = function (filename: string): any | undefined {
         if (program === undefined) {
             console.warn('Could not rendering anything because the filter was not selected');
             return undefined;
         }
+
         if (emoteImage == undefined) {
             console.warn('Could not rendering anything because the image was not selected');
             return undefined;
         }
-        var gif = new GIF({
+
+        const gif = new GIF({
             workers: 5,
             quality: 10,
             width: CANVAS_WIDTH,
             height: CANVAS_HEIGHT,
             transparent: program.transparent,
         });
-        var context = {
+
+        const context: UserContext = {
             "vars": {
                 "Math.PI": Math.PI
             }
         };
         if (context.vars !== undefined) {
-            var snapshot = program.paramsPanel.paramsSnapshot$();
-            for (var paramName in snapshot) {
+            const snapshot = program.paramsPanel.paramsSnapshot$();
+            for (let paramName in snapshot) {
                 context.vars[paramName] = snapshot[paramName].value;
             }
         }
-        var fps = 30;
-        var dt = 1.0 / fps;
+
+        const fps = 30;
+        const dt = 1.0 / fps;
         // TODO(#59): come up with a reasonable way to handle malicious durations
-        var duration = Math.min(run_expr(program.duration, context), 60);
-        var renderProgress = document.getElementById("render-progress");
+        const duration = Math.min(run_expr(program.duration, context), 60);
+
+        const renderProgress = document.getElementById("render-progress");
         if (renderProgress === null) {
             throw new Error('Could not find "render-progress"');
         }
-        var renderSpinner = document.getElementById("render-spinner");
+        const renderSpinner = document.getElementById("render-spinner");
         if (renderSpinner === null) {
             throw new Error('Could not find "render-spinner"');
         }
-        var renderPreview = document.getElementById("render-preview");
+        const renderPreview = document.getElementById("render-preview") as HTMLImageElement;
         if (renderPreview === null) {
             throw new Error('Could not find "render-preview"');
         }
-        var renderDownload = document.getElementById("render-download");
+        const renderDownload = document.getElementById("render-download") as HTMLAnchorElement;
         if (renderDownload === null) {
             throw new Error('Could not find "render-download"');
         }
+
         renderPreview.style.display = "none";
         renderSpinner.style.display = "block";
-        var t = 0.0;
+
+        let t = 0.0;
         while (t <= duration) {
             gl.uniform1f(program.uniforms.time, t);
             gl.uniform2f(program.uniforms.resolution, CANVAS_WIDTH, CANVAS_HEIGHT);
             gl.uniform2f(program.uniforms.emoteSize, emoteImage.width, emoteImage.height);
+
             gl.clearColor(0.0, 1.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
-            var pixels = new Uint8ClampedArray(4 * CANVAS_WIDTH * CANVAS_HEIGHT);
+
+            let pixels = new Uint8ClampedArray(4 * CANVAS_WIDTH * CANVAS_HEIGHT);
             gl.readPixels(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
             // Flip the image vertically
             {
-                var center = Math.floor(CANVAS_HEIGHT / 2);
-                for (var y = 0; y < center; ++y) {
-                    var row = 4 * CANVAS_WIDTH;
-                    for (var x = 0; x < row; ++x) {
-                        var ai = y * 4 * CANVAS_WIDTH + x;
-                        var bi = (CANVAS_HEIGHT - y - 1) * 4 * CANVAS_WIDTH + x;
-                        var a_1 = pixels[ai];
-                        var b = pixels[bi];
+                const center = Math.floor(CANVAS_HEIGHT / 2);
+                for (let y = 0; y < center; ++y) {
+                    const row = 4 * CANVAS_WIDTH;
+                    for (let x = 0; x < row; ++x) {
+                        const ai = y * 4 * CANVAS_WIDTH + x;
+                        const bi = (CANVAS_HEIGHT - y - 1) * 4 * CANVAS_WIDTH + x;
+                        const a = pixels[ai];
+                        const b = pixels[bi];
                         pixels[ai] = b;
-                        pixels[bi] = a_1;
+                        pixels[bi] = a;
                     }
                 }
             }
+
             gif.addFrame(new ImageData(pixels, CANVAS_WIDTH, CANVAS_HEIGHT), {
                 delay: dt * 1000,
                 dispose: 2,
             });
-            renderProgress.style.width = (t / duration) * 50 + "%";
+
+            renderProgress.style.width = `${(t / duration) * 50}%`;
+
             t += dt;
         }
-        gif.on('finished', function (blob) {
+
+        gif.on('finished', (blob) => {
             renderPreview.src = URL.createObjectURL(blob);
             renderPreview.style.display = "block";
             renderDownload.href = renderPreview.src;
             renderDownload.download = filename;
             renderDownload.style.display = "block";
             renderSpinner.style.display = "none";
+
         });
-        gif.on('progress', function (p) {
-            renderProgress.style.width = 50 + p * 50 + "%";
+
+        gif.on('progress', (p) => {
+            renderProgress.style.width = `${50 + p * 50}%`;
         });
+
         gif.render();
+
         return gif;
     };
+
     // Rendering Loop
     {
-        var step_1 = function (timestamp) {
+        const step = function(timestamp: number) {
             gl.clearColor(0.0, 1.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
+
             if (program && emoteImage) {
                 gl.uniform1f(program.uniforms.time, timestamp * 0.001);
                 gl.uniform2f(program.uniforms.resolution, filterPreview.width, filterPreview.height);
                 gl.uniform2f(program.uniforms.emoteSize, emoteImage.width, emoteImage.height);
+
                 gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
             }
-            window.requestAnimationFrame(step_1);
-        };
-        window.requestAnimationFrame(step_1);
+
+            window.requestAnimationFrame(step);
+        }
+
+        window.requestAnimationFrame(step);
     }
+
     return root;
 }
-window.onload = function () {
+
+window.onload = () => {
     feature_params = new URLSearchParams(document.location.search).has("feature-params");
-    var filterSelectorEntry = document.getElementById('filter-selector-entry');
+
+    const filterSelectorEntry = document.getElementById('filter-selector-entry');
     if (filterSelectorEntry === null) {
         throw new Error('Could not find "filter-selector-entry"');
     }
-    var imageSelectorEntry = document.getElementById('filter-selector-entry');
+    const imageSelectorEntry = document.getElementById('filter-selector-entry');
     if (imageSelectorEntry === null) {
         throw new Error('Could not find "image-selector-entry"');
     }
-    var imageSelector = ImageSelector();
-    var filterSelector = FilterSelector();
-    imageSelector.addEventListener('imageSelected', function (e) {
+
+    const imageSelector = ImageSelector();
+    const filterSelector = FilterSelector();
+    imageSelector.addEventListener('imageSelected', function(e: CustomEvent) {
         filterSelector.updateImage$(e.detail.imageData);
     });
     filterSelectorEntry.appendChild(filterSelector);
     imageSelectorEntry.appendChild(imageSelector);
+
     // drag file from anywhere
-    document.ondrop = function (event) {
-        var _a;
+    document.ondrop = function(event: DragEvent) {
         event.preventDefault();
-        imageSelector.updateFiles$((_a = event.dataTransfer) === null || _a === void 0 ? void 0 : _a.files);
-    };
-    document.ondragover = function (event) {
+        imageSelector.updateFiles$(event.dataTransfer?.files);
+    }
+
+    document.ondragover = function(event) {
         event.preventDefault();
-    };
+    }
+
     // TODO(#50): extract "renderer" as a separate grecha.js component
     // Similar to imageSelector and filterSelector
-    var gif = undefined;
-    var renderButton = document.getElementById("render");
+    let gif: any | undefined = undefined;
+    const renderButton = document.getElementById("render");
     if (renderButton === null) {
         throw new Error('Could not find "render"');
     }
-    renderButton.onclick = function () {
+    renderButton.onclick = function() {
         if (gif && gif.running) {
             gif.abort();
         }
-        var fileName = imageSelector.selectedFileName$();
-        gif = filterSelector.render$(fileName + ".gif");
+        const fileName = imageSelector.selectedFileName$();
+        gif = filterSelector.render$(`${fileName}.gif`);
     };
-};
+}

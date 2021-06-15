@@ -66,11 +66,11 @@ function select(...children: Child[]): Tag {
 }
 
 
-function img(src: string) {
+function img(src: string): Tag {
     return tag("img").att$("src", src);
 }
 
-function input(type: string) {
+function input(type: string): Tag {
     return tag("input").att$("type", type);
 }
 

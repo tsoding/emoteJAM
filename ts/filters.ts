@@ -8,7 +8,7 @@ interface Param {
 }
 
 interface Filter {
-    transparent: number | null,
+    transparent: string | null,
     duration: string,
     params?: {
         [name: string]: Param
@@ -21,7 +21,7 @@ interface Filter {
 // TODO(#61): human readable titles for the filter params
 const filters: {[name: string]: Filter} = {
     "Hop": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "interval * 2",
         // TODO(#62): when you have too many params the UI gets really cluttered
         "params": {
@@ -127,7 +127,7 @@ void main() {
 `
     },
     "Hopper": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "0.85",
         "vertex": `#version 100
 precision mediump float;
@@ -183,7 +183,7 @@ void main() {
 `
     },
     "Overheat": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "0.85 / 8.0 * 2.0",
         "vertex": `#version 100
 precision mediump float;
@@ -239,7 +239,7 @@ void main() {
 `
     },
     "Bounce": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "Math.PI / period",
         "params": {
             "period": {
@@ -295,7 +295,7 @@ void main() {
 `,
     },
     "Circle": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "Math.PI / 4.0",
         "vertex": `#version 100
 precision mediump float;
@@ -347,7 +347,7 @@ void main() {
 `,
     },
     "Slide": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "0.85 * 2",
         "vertex": `#version 100
 precision mediump float;
@@ -403,7 +403,7 @@ void main() {
 `
     },
     "Laughing": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "Math.PI / 12.0",
         "vertex": `#version 100
 precision mediump float;
@@ -442,7 +442,7 @@ void main() {
 `
     },
     "Blob": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "Math.PI / 3",
         "vertex": `#version 100
 
@@ -484,7 +484,7 @@ void main() {
 `
     },
     "Go": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "1 / 4",
         "vertex": `#version 100
 precision mediump float;
@@ -525,7 +525,7 @@ void main() {
 `,
     },
     "Elevator": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "1 / 4",
         "vertex": `#version 100
 precision mediump float;
@@ -568,7 +568,7 @@ void main() {
 `,
     },
     "Rain": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "1",
         "vertex": `#version 100
 precision mediump float;
@@ -658,7 +658,7 @@ void main() {
 `,
     },
     "Hard": {
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "2.0 * Math.PI / intensity",
         "params": {
             "zoom": {
@@ -722,7 +722,7 @@ void main() {
 `,
     },
 	"Peek":{
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "2.0 * Math.PI" ,
         "vertex": `#version 100
 precision mediump float;
@@ -871,7 +871,7 @@ void main() {
         `
     },
     "Flag":{
-        "transparent": 0x00FF00,
+        "transparent": 0x00FF00 + "",
         "duration": "Math.PI",
         "vertex":`
         #version 100
