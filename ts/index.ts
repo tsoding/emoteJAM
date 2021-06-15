@@ -518,7 +518,7 @@ window.onload = () => {
     if (filterSelectorEntry === null) {
         throw new Error('Could not find "filter-selector-entry"');
     }
-    const imageSelectorEntry = document.getElementById('filter-selector-entry');
+    const imageSelectorEntry = document.getElementById('image-selector-entry');
     if (imageSelectorEntry === null) {
         throw new Error('Could not find "image-selector-entry"');
     }
