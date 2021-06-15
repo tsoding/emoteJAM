@@ -1,7 +1,7 @@
 type BinaryOp = '+' | '-' | '*' | '/' | '%';
 type BinaryOpFunc = (lhs: number, rhs: number) => number;
 
-const BINARY_OPS: {[op: string]: BinaryOpFunc} = {
+const BINARY_OPS: {[op in BinaryOp]: BinaryOpFunc} = {
     '+': (lhs, rhs) => lhs + rhs,
     '-': (lhs, rhs) => lhs - rhs,
     '*': (lhs, rhs) => lhs * rhs,
@@ -12,7 +12,7 @@ const BINARY_OPS: {[op: string]: BinaryOpFunc} = {
 type UnaryOp = '-';
 type UnaryOpFunc = (arg: number) => number;
 
-const UNARY_OPS: {[op: string]: UnaryOpFunc} = {
+const UNARY_OPS: {[op in UnaryOp]: UnaryOpFunc} = {
     '-': (arg: number) => -arg,
 };
 
