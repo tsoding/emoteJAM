@@ -196,11 +196,3 @@ function run_expr(expr, user_context) {
         }
     }
 }
-console.log(run_expr(compile_expr("1 + f(x) * 3"), {
-    "vars": {
-        "x": 69
-    },
-    "funcs": {
-        "f": function (x) { return x + 1; }
-    },
-}));

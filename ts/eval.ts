@@ -258,14 +258,3 @@ function run_expr(expr: Expr, user_context: UserContext = {}): number {
     }
     }
 }
-
-console.log(run_expr(
-    compile_expr("1 + f(x) * 3"),
-    {
-        "vars": {
-            "x": 69
-        },
-        "funcs": {
-            "f": (x) => x + 1
-        },
-    }));
