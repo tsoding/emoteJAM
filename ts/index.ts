@@ -385,7 +385,7 @@ function FilterSelector() {
             return undefined;
         }
 
-        // TODO: gif.js typing are absolutely broken
+        // TODO(#74): gif.js typing are absolutely broken
         const gif = new GIF({
             workers: 5,
             quality: 10,
