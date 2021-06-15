@@ -556,4 +556,4 @@ window.onload = () => {
         gif = filterSelector.render$(`${fileName}.gif`);
     };
 }
-// TODO: run typescript compiler on CI
+// TODO(#75): run typescript compiler on CI
