@@ -1,13 +1,9 @@
 "use strict";
-// TODO(#58): add params to all of the filters
-// TODO(#61): human readable titles for the filter params
 var filters = {
     "Hop": {
         "transparent": 0x00FF00 + "",
         "duration": "interval * 2",
-        // TODO(#62): when you have too many params the UI gets really cluttered
         "params": {
-            // TODO(#65): filter params should have help tooltips associated with them
             "interval": {
                 "label": "Interval",
                 "type": "float",
@@ -32,8 +28,6 @@ var filters = {
                 "max": 1.0,
                 "step": 0.01,
             },
-            // TODO(#63): jump_height in the "Hop" filter does not make any sense
-            // If it's bigger the emote should jump higher. Right now it is the other way around.
             "jump_height": {
                 "label": "Jump Height",
                 "type": "float",

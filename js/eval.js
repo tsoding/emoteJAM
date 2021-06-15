@@ -9,7 +9,7 @@ var BINARY_OPS = {
 var UNARY_OPS = {
     '-': function (arg) { return -arg; },
 };
-var Lexer = /** @class */ (function () {
+var Lexer = (function () {
     function Lexer(src) {
         this.src = src;
     }

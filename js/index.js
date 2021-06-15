@@ -53,20 +53,13 @@ function createTextureFromImage(gl, image) {
         throw new Error('Could not create a new WebGL texture');
     }
     gl.bindTexture(gl.TEXTURE_2D, textureId);
-    gl.texImage2D(gl.TEXTURE_2D, // target
-    0, // level
-    gl.RGBA, // internalFormat
-    gl.RGBA, // srcFormat
-    gl.UNSIGNED_BYTE, // srcType
-    image // image
-    );
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     return textureId;
 }
-// TODO(#54): pre-load all of the filters and just switch between them without loading/unloading them constantly
 function loadFilterProgram(gl, filter, vertexAttribs) {
     var _a;
     var vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
@@ -80,7 +73,6 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         "time": gl.getUniformLocation(id, 'time'),
         "emoteSize": gl.getUniformLocation(id, 'emoteSize'),
     };
-    // TODO(#55): there no "reset to default" button in the params panel of a filter
     var paramsPanel = div().att$("class", "widget-element");
     var paramsInputs = {};
     var _loop_1 = function (paramName) {
@@ -183,7 +175,6 @@ function ImageSelector() {
 }
 function FilterList() {
     var root = select();
-    // Populating the FilterList
     for (var name_1 in filters) {
         root.add(new Option(name_1));
     }
@@ -220,11 +211,9 @@ function FilterSelector() {
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
     }
-    // Initialize GL
     {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        // Mesh Position
         {
             var meshPositionBufferData = new Float32Array(TRIANGLE_PAIR * TRIANGLE_VERTICIES * VEC2_COUNT);
             for (var triangle = 0; triangle < TRIANGLE_PAIR; ++triangle) {
@@ -244,7 +233,6 @@ function FilterSelector() {
             gl.enableVertexAttribArray(meshPositionAttrib);
         }
     }
-    // TODO(#49): FilterSelector does not handle loadFilterProgram() failures
     var emoteImage = undefined;
     var emoteTexture = undefined;
     var program = undefined;
@@ -313,7 +301,6 @@ function FilterSelector() {
         }
         var fps = 30;
         var dt = 1.0 / fps;
-        // TODO(#59): come up with a reasonable way to handle malicious durations
         var duration = Math.min(run_expr(program.duration, context), 60);
         var renderProgress = document.getElementById("render-progress");
         if (renderProgress === null) {
@@ -343,7 +330,6 @@ function FilterSelector() {
             gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
             var pixels = new Uint8ClampedArray(4 * CANVAS_WIDTH * CANVAS_HEIGHT);
             gl.readPixels(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-            // Flip the image vertically
             {
                 var center = Math.floor(CANVAS_HEIGHT / 2);
                 for (var y = 0; y < center; ++y) {
@@ -379,7 +365,6 @@ function FilterSelector() {
         gif.render();
         return gif;
     };
-    // Rendering Loop
     {
         var step_1 = function (timestamp) {
             gl.clearColor(0.0, 1.0, 0.0, 1.0);
@@ -413,7 +398,6 @@ window.onload = function () {
     });
     filterSelectorEntry.appendChild(filterSelector);
     imageSelectorEntry.appendChild(imageSelector);
-    // drag file from anywhere
     document.ondrop = function (event) {
         var _a;
         event.preventDefault();
@@ -422,8 +406,6 @@ window.onload = function () {
     document.ondragover = function (event) {
         event.preventDefault();
     };
-    // TODO(#50): extract "renderer" as a separate grecha.js component
-    // Similar to imageSelector and filterSelector
     var gif = undefined;
     var renderButton = document.getElementById("render");
     if (renderButton === null) {
