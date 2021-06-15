@@ -1,199 +1,206 @@
-const BINARY_OPS = {
-    '+': (lhs, rhs) => lhs + rhs,
-    '-': (lhs, rhs) => lhs - rhs,
-    '*': (lhs, rhs) => lhs * rhs,
-    '/': (lhs, rhs) => lhs / rhs,
-    '%': (lhs, rhs) => lhs % rhs,
+"use strict";
+var BINARY_OPS = {
+    '+': function (lhs, rhs) { return lhs + rhs; },
+    '-': function (lhs, rhs) { return lhs - rhs; },
+    '*': function (lhs, rhs) { return lhs * rhs; },
+    '/': function (lhs, rhs) { return lhs / rhs; },
+    '%': function (lhs, rhs) { return lhs % rhs; },
 };
-
-const UNARY_OPS = {
-    '-': (arg) => -arg,
+var UNARY_OPS = {
+    '-': function (arg) { return -arg; },
 };
-
-class Lexer {
-    constructor(src) {
+var Lexer = /** @class */ (function () {
+    function Lexer(src) {
         this.src = src;
     }
-
-    unnext(token) {
+    Lexer.prototype.unnext = function (token) {
         this.src = token + this.src;
-    }
-
-    next() {
+    };
+    Lexer.prototype.next = function () {
         this.src = this.src.trimStart();
-
         if (this.src.length == 0) {
             return null;
         }
-
         function is_token_break(c) {
-            const syntax = '(),';
+            var syntax = '(),';
             return c in BINARY_OPS || c in UNARY_OPS || syntax.includes(c);
         }
-
         if (is_token_break(this.src[0])) {
-            const token = this.src[0];
+            var token_1 = this.src[0];
             this.src = this.src.slice(1);
-            return token;
+            return token_1;
         }
-
-        for (let i = 0; i < this.src.length; ++i) {
+        for (var i = 0; i < this.src.length; ++i) {
             if (is_token_break(this.src[i]) || this.src[i] == ' ') {
-                const token = this.src.slice(0, i);
+                var token_2 = this.src.slice(0, i);
                 this.src = this.src.slice(i);
-                return token;
+                return token_2;
             }
         }
-
-        const token = this.src;
+        var token = this.src;
         this.src = '';
         return token;
-    }
-}
-
+    };
+    return Lexer;
+}());
 function parse_primary(lexer) {
-    let token = lexer.next();
+    var token = lexer.next();
     if (token !== null) {
         if (token in UNARY_OPS) {
-            let operand = parse(lexer);
+            var operand = parse(lexer);
             return {
                 "kind": "unary_op",
-                "op": token,
-                "operand": operand,
+                "payload": {
+                    "op": token,
+                    "operand": operand,
+                },
             };
-        } else if (token === '(') {
-            let expr = parse(lexer);
+        }
+        else if (token === '(') {
+            var expr = parse(lexer);
             token = lexer.next();
             if (token !== ')') {
-                throw new Error(`Expected ')' but got '${token}'`);
+                throw new Error("Expected ')' but got '" + token + "'");
             }
             return expr;
-        } else if (token === ')') {
-            throw new Error(`No primary expression starts with ')'`);
-        } else {
-            let next_token = lexer.next();
+        }
+        else if (token === ')') {
+            throw new Error("No primary expression starts with ')'");
+        }
+        else {
+            var next_token = lexer.next();
             if (next_token === '(') {
-                const args = [];
-
+                var args = [];
                 next_token = lexer.next();
                 if (next_token === ')') {
                     return {
                         "kind": "funcall",
-                        "name": token,
-                        "args": args,
+                        "payload": {
+                            "name": token,
+                            "args": args,
+                        }
                     };
                 }
-
+                if (next_token === null) {
+                    throw Error("Unexpected end of input");
+                }
                 lexer.unnext(next_token);
                 args.push(parse(lexer));
-
                 next_token = lexer.next();
                 while (next_token == ',') {
                     args.push(parse(lexer));
                     next_token = lexer.next();
                 }
-
                 if (next_token !== ')') {
-                    throw Error(`Expected ')' but got '${next_token}'`);
+                    throw Error("Expected ')' but got '" + next_token + "'");
                 }
-
                 return {
                     "kind": "funcall",
-                    "name": token,
-                    "args": args,
+                    "payload": {
+                        "name": token,
+                        "args": args,
+                    }
                 };
-            } else {
+            }
+            else {
                 if (next_token !== null) {
                     lexer.unnext(next_token);
                 }
                 return {
                     "kind": "symbol",
-                    "value": token
+                    "payload": {
+                        "value": token
+                    }
                 };
             }
         }
-    } else {
+    }
+    else {
         throw new Error('Expected primary expression but reached the end of the input');
     }
 }
-
 function parse(lexer) {
-    let lhs = parse_primary(lexer);
-
-    let op_token = lexer.next();
+    var lhs = parse_primary(lexer);
+    var op_token = lexer.next();
     if (op_token !== null) {
         if (op_token in BINARY_OPS) {
-            let rhs = parse(lexer);
+            var rhs = parse(lexer);
             return {
                 "kind": "binary_op",
-                "op": op_token,
-                "lhs": lhs,
-                "rhs": rhs,
+                "payload": {
+                    "op": op_token,
+                    "lhs": lhs,
+                    "rhs": rhs,
+                }
             };
-        } else {
+        }
+        else {
             lexer.unnext(op_token);
         }
     }
-
     return lhs;
 }
-
 function compile_expr(src) {
-    const lexer = new Lexer(src);
-    const result = parse(lexer);
-    const token = lexer.next();
+    var lexer = new Lexer(src);
+    var result = parse(lexer);
+    var token = lexer.next();
     if (token !== null) {
-        console.log(typeof(token));
+        console.log(typeof (token));
         console.log(token);
-        throw new Error(`Unexpected token '${token}'`);
+        throw new Error("Unexpected token '" + token + "'");
     }
     return result;
 }
-
-function run_expr(expr, user_context = {}) {
-    console.assert(typeof(expr) === 'object');
-
+function run_expr(expr, user_context) {
+    var _a;
+    if (user_context === void 0) { user_context = {}; }
+    console.assert(typeof (expr) === 'object');
     switch (expr.kind) {
-    case 'symbol': {
-        const value = expr.value;
-        const number = Number(value);
-        if (isNaN(number)) {
-            if (user_context.vars && value in user_context.vars) {
-                return user_context.vars[value];
+        case 'symbol': {
+            var symbol = expr.payload;
+            var value = symbol.value;
+            var number = Number(value);
+            if (isNaN(number)) {
+                if (user_context.vars && value in user_context.vars) {
+                    return user_context.vars[value];
+                }
+                throw new Error("Unknown variable '" + value + "'");
             }
-
-            throw new Error(`Unknown variable '${value}'`);
-        } else {
-            return number;
+            else {
+                return number;
+            }
         }
-    } break;
-
-    case 'unary_op': {
-        if (expr.op in UNARY_OPS) {
-            return UNARY_OPS[expr.op](run_expr(expr.operand, user_context));
+        case 'unary_op': {
+            var unary_op = expr.payload;
+            if (unary_op.op in UNARY_OPS) {
+                return UNARY_OPS[unary_op.op](run_expr(unary_op.operand, user_context));
+            }
+            throw new Error("Unknown unary operator '" + unary_op.op + "'");
         }
-
-        throw new Error(`Unknown unary operator '${expr.op}'`);
-    } break;
-
-    case 'binary_op': {
-        if (expr.op in BINARY_OPS) {
-            return BINARY_OPS[expr.op](run_expr(expr.lhs, user_context), run_expr(expr.rhs, user_context));
+        case 'binary_op': {
+            var binary_op = expr.payload;
+            if (binary_op.op in BINARY_OPS) {
+                return BINARY_OPS[binary_op.op](run_expr(binary_op.lhs, user_context), run_expr(binary_op.rhs, user_context));
+            }
+            throw new Error("Unknown binary operator '" + binary_op.op + "'");
         }
-
-        throw new Error(`Unknown binary operator '${expr.op}'`);
-    } break;
-
-    case 'funcall': {
-        if (user_context.funcs && expr.name in user_context.funcs) {
-            return user_context.funcs[expr.name](...expr.args.map((arg) => run_expr(arg, user_context)));
+        case 'funcall': {
+            var funcall = expr.payload;
+            if (user_context.funcs && funcall.name in user_context.funcs) {
+                return (_a = user_context.funcs)[funcall.name].apply(_a, funcall.args.map(function (arg) { return run_expr(arg, user_context); }));
+            }
+            throw new Error("Unknown function '" + funcall.name + "'");
         }
-
-        throw new Error(`Unknown function '${expr.name}'`);
-    } break;
-
-    default: {
-        throw new Error(`Unexpected AST node '${expr.kind}'`);
-    }
+        default: {
+            throw new Error("Unexpected AST node '" + expr.kind + "'");
+        }
     }
 }
+console.log(run_expr(compile_expr("1 + f(x) * 3"), {
+    "vars": {
+        "x": 69
+    },
+    "funcs": {
+        "f": function (x) { return x + 1; }
+    },
+}));
