@@ -130,85 +130,6 @@ var filters = {
         "vertex": "#version 100\nprecision mediump float;\n\nattribute vec2 meshPosition;\n\nuniform vec2 resolution;\nuniform float time;\n\nvarying vec2 uv;\n\nvoid main() {\n    gl_Position = vec4(meshPosition, 0.0, 1.0);\n    uv = (meshPosition + 1.0) / 2.0;\n}\n",
         "fragment": "\n#version 100\n\nprecision mediump float;\n\nuniform vec2 resolution;\nuniform float time;\n\nuniform sampler2D emote;\n\nvarying vec2 uv;\n\nvec3 hsl2rgb(vec3 c) {\n    vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0);\n    return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));\n}\n\nvoid main() {\n    float speed = 1.0;\n\n    vec4 pixel = texture2D(emote, vec2(uv.x, 1.0 - uv.y));\n    pixel.w = floor(pixel.w + 0.5);\n    pixel = vec4(mix(vec3(1.0), pixel.xyz, pixel.w), 1.0);\n    vec4 rainbow = vec4(hsl2rgb(vec3((time - uv.x - uv.y) * 0.5, 1.0, 0.80)), 1.0);\n    gl_FragColor = pixel * rainbow;\n}\n",
     },
-    "Thanosed": {
-        "transparent": 0x00FF00,
-        "duration": "duration",
-        "params": {
-            "duration": {
-                "type": "float",
-                "init": 6.0,
-                "min": 1.0,
-                "max": 16.0,
-                "step": 1.0,
-            },
-            "delay": {
-                "type": "float",
-                "init": 0.2,
-                "min": 0.0,
-                "max": 1.0,
-                "step": 0.1,
-            },
-            "pixelization": {
-                "type": "float",
-                "init": 1.0,
-                "min": 1.0,
-                "max": 3.0,
-                "step": 1.0,
-            },
-        },
-        "vertex": `#version 100
-precision mediump float;
-
-attribute vec2 meshPosition;
-
-uniform vec2 resolution;
-uniform float time;
-
-varying vec2 uv;
-
-void main() {
-    gl_Position = vec4(meshPosition, 0.0, 1.0);
-    uv = (meshPosition + 1.0) / 2.0;
-}
-`,
-        "fragment": `
-#version 100
-
-precision mediump float;
-
-uniform vec2 resolution;
-uniform float time;
-uniform float duration;
-uniform float delay;
-uniform float pixelization;
-
-uniform sampler2D emote;
-
-varying vec2 uv;
-
-// https://www.aussiedwarf.com/2017/05/09/Random10Bit.html
-float rand(vec2 co){
-  vec3 product = vec3(  sin( dot(co, vec2(0.129898,0.78233))),
-                        sin( dot(co, vec2(0.689898,0.23233))),
-                        sin( dot(co, vec2(0.434198,0.51833))) );
-  vec3 weighting = vec3(4.37585453723, 2.465973, 3.18438);
-  return fract(dot(weighting, product));
-}
-
-void main() {
-    float pixelated_resolution = 112.0 / pixelization;
-    vec2 pixelated_uv = floor(uv * pixelated_resolution);
-    float noise = (rand(pixelated_uv) + 1.0) / 2.0;
-    float slope = (0.2 + noise * 0.8) * (1.0 - (0.0 + uv.x * 0.5));
-    float time_interval = 1.1 + delay * 2.0;
-    float progress = 0.2 + delay + slope - mod(time_interval * time / duration, time_interval);
-    float mask = progress > 0.1 ? 1.0 : 0.0;
-    vec4 pixel = texture2D(emote, vec2(uv.x * (progress > 0.5 ? 1.0 : progress * 2.0), 1.0 - uv.y));
-    pixel.w = floor(pixel.w + 0.5);
-    gl_FragColor = pixel * vec4(vec3(1.0), mask);
-}
-`,
-    },
     "Hard": {
         "transparent": 0x00FF00 + "",
         "duration": "2.0 * Math.PI / intensity",
@@ -255,5 +176,34 @@ void main() {
         "duration": "Math.PI",
         "vertex": "\n        #version 100\n        precision mediump float;\n\n        attribute vec2 meshPosition;\n\n        uniform vec2 resolution;\n        uniform float time;\n\n        varying vec2 _uv;\n\n        void main()\n        {\n            _uv = (meshPosition + 1.0) / 2.0;\n            _uv.y = 1.0 - _uv.y;\n            gl_Position = vec4(meshPosition.x, meshPosition.y, 0.0, 1.0);\n        }\n        ",
         "fragment": "\n        #version 100\n        precision mediump float;\n\n        varying vec2 _uv;\n        uniform sampler2D emote;\n        uniform float time;\n\n        float sin01(float value)\n        {\n            return (sin(value) + 1.0) / 2.0;\n        }\n\n        //pos is left bottom point.\n        float sdf_rect(vec2 pos, vec2 size, vec2 uv)\n        {\n            float left = pos.x;\n            float right = pos.x + size.x;\n            float bottom = pos.y;\n            float top = pos.y + size.y;\n            return (step(bottom, uv.y) - step(top, uv.y)) * (step(left, uv.x) - step(right, uv.x)); \n        }\n\n        void main() {\n            float stick_width = 0.1;\n            float flag_height = 0.75;\n            float wave_size = 0.08;\n            vec4 stick_color = vec4(107.0 / 256.0, 59.0 / 256.0, 9.0 / 256.0,1);\n            \n            vec2 flag_uv = _uv;\n            flag_uv.x = (1.0 / (1.0 - stick_width)) * (flag_uv.x - stick_width);\n            flag_uv.y *= 1.0 / flag_height;\n\n            float flag_close_to_stick = smoothstep(0.0, 0.5, flag_uv.x);\n            flag_uv.y += sin((-time * 2.0) + (flag_uv.x * 8.0)) * flag_close_to_stick * wave_size;\n\n            float is_flag = sdf_rect(vec2(0,0), vec2(1.0, 1.0), flag_uv);\n            float is_flag_stick = sdf_rect(vec2(0.0, 0.0), vec2(stick_width, 1), _uv);\n\n            vec4 emote_color = texture2D(emote, flag_uv);\n            vec4 texture_color = (emote_color * is_flag) + (stick_color * is_flag_stick);\n\n            gl_FragColor = texture_color;\n        }\n        "
+    },
+    "Thanosed": {
+        "transparent": 0x00FF00 + "",
+        "duration": "duration",
+        "params": {
+            "duration": {
+                "type": "float",
+                "init": 6.0,
+                "min": 1.0,
+                "max": 16.0,
+                "step": 1.0,
+            },
+            "delay": {
+                "type": "float",
+                "init": 0.2,
+                "min": 0.0,
+                "max": 1.0,
+                "step": 0.1,
+            },
+            "pixelization": {
+                "type": "float",
+                "init": 1.0,
+                "min": 1.0,
+                "max": 3.0,
+                "step": 1.0,
+            },
+        },
+        "vertex": "#version 100\nprecision mediump float;\n\nattribute vec2 meshPosition;\n\nuniform vec2 resolution;\nuniform float time;\n\nvarying vec2 uv;\n\nvoid main() {\n    gl_Position = vec4(meshPosition, 0.0, 1.0);\n    uv = (meshPosition + 1.0) / 2.0;\n}\n",
+        "fragment": "\n#version 100\n\nprecision mediump float;\n\nuniform vec2 resolution;\nuniform float time;\nuniform float duration;\nuniform float delay;\nuniform float pixelization;\n\nuniform sampler2D emote;\n\nvarying vec2 uv;\n\n// https://www.aussiedwarf.com/2017/05/09/Random10Bit.html\nfloat rand(vec2 co){\n  vec3 product = vec3(  sin( dot(co, vec2(0.129898,0.78233))),\n                        sin( dot(co, vec2(0.689898,0.23233))),\n                        sin( dot(co, vec2(0.434198,0.51833))) );\n  vec3 weighting = vec3(4.37585453723, 2.465973, 3.18438);\n  return fract(dot(weighting, product));\n}\n\nvoid main() {\n    float pixelated_resolution = 112.0 / pixelization;\n    vec2 pixelated_uv = floor(uv * pixelated_resolution);\n    float noise = (rand(pixelated_uv) + 1.0) / 2.0;\n    float slope = (0.2 + noise * 0.8) * (1.0 - (0.0 + uv.x * 0.5));\n    float time_interval = 1.1 + delay * 2.0;\n    float progress = 0.2 + delay + slope - mod(time_interval * time / duration, time_interval);\n    float mask = progress > 0.1 ? 1.0 : 0.0;\n    vec4 pixel = texture2D(emote, vec2(uv.x * (progress > 0.5 ? 1.0 : progress * 2.0), 1.0 - uv.y));\n    pixel.w = floor(pixel.w + 0.5);\n    gl_FragColor = pixel * vec4(vec3(1.0), mask);\n}\n",
     }
 };
