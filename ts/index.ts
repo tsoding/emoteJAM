@@ -543,7 +543,7 @@ window.onload = () => {
 
     // TODO(#50): extract "renderer" as a separate grecha.js component
     // Similar to imageSelector and filterSelector
-    let gif: any | undefined = undefined;
+    let gif: GIF | undefined = undefined;
     const renderButton = document.getElementById("render");
     if (renderButton === null) {
         throw new Error('Could not find "render"');
