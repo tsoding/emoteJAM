@@ -175,7 +175,7 @@ function loadFilterProgram(gl: WebGLRenderingContext, filter: Filter, vertexAttr
         for (let paramName in paramsInputs) {
             snapshot[paramName] = {
                 "uniform": uniforms[paramName],
-                "value": paramsInputs[paramName].value
+                "value": Number(paramsInputs[paramName].value)
             };
         }
         return snapshot;
