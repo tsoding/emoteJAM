@@ -84,16 +84,16 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
                 {
                     var valuePreview_1 = span(filter.params[paramName].init.toString());
                     var valueInput = input("range");
-                    if (filter.params[paramName].min) {
+                    if (filter.params[paramName].min !== undefined) {
                         valueInput.att$("min", filter.params[paramName].min);
                     }
-                    if (filter.params[paramName].max) {
+                    if (filter.params[paramName].max !== undefined) {
                         valueInput.att$("max", filter.params[paramName].max);
                     }
-                    if (filter.params[paramName].step) {
+                    if (filter.params[paramName].step !== undefined) {
                         valueInput.att$("step", filter.params[paramName].step);
                     }
-                    if (filter.params[paramName].init) {
+                    if (filter.params[paramName].init !== undefined) {
                         valueInput.att$("value", filter.params[paramName].init);
                     }
                     paramsInputs[paramName] = valueInput;
