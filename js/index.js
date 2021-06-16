@@ -1,140 +1,122 @@
-let feature_params = false; 
-
-const vertexAttribs = {
+"use strict";
+var feature_params = false;
+var vertexAttribs = {
     "meshPosition": 0
 };
-const TRIANGLE_PAIR = 2;
-const TRIANGLE_VERTICIES = 3;
-const VEC2_COUNT = 2;
-const VEC2_X = 0;
-const VEC2_Y = 1;
-const CANVAS_WIDTH = 112;
-const CANVAS_HEIGHT = 112;
-
+var TRIANGLE_PAIR = 2;
+var TRIANGLE_VERTICIES = 3;
+var VEC2_COUNT = 2;
+var VEC2_X = 0;
+var VEC2_Y = 1;
+var CANVAS_WIDTH = 112;
+var CANVAS_HEIGHT = 112;
 function compileShaderSource(gl, source, shaderType) {
     function shaderTypeToString() {
         switch (shaderType) {
-        case gl.VERTEX_SHADER: return 'Vertex';
-        case gl.FRAGMENT_SHADER: return 'Fragment';
-        default: return shaderType;
+            case gl.VERTEX_SHADER: return 'Vertex';
+            case gl.FRAGMENT_SHADER: return 'Fragment';
+            default: return shaderType;
         }
     }
-
-    const shader = gl.createShader(shaderType);
+    var shader = gl.createShader(shaderType);
+    if (shader === null) {
+        throw new Error("Could not create a new shader");
+    }
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error(`Could not compile ${shaderTypeToString()} shader: ${gl.getShaderInfoLog(shader)}`);
+        throw new Error("Could not compile " + shaderTypeToString() + " shader: " + gl.getShaderInfoLog(shader));
     }
     return shader;
 }
-
 function linkShaderProgram(gl, shaders, vertexAttribs) {
-    const program = gl.createProgram();
-    for (let shader of shaders) {
+    var program = gl.createProgram();
+    if (program === null) {
+        throw new Error('Could not create a new shader program');
+    }
+    for (var _i = 0, shaders_1 = shaders; _i < shaders_1.length; _i++) {
+        var shader = shaders_1[_i];
         gl.attachShader(program, shader);
     }
-
-    for (let vertexName in vertexAttribs) {
+    for (var vertexName in vertexAttribs) {
         gl.bindAttribLocation(program, vertexAttribs[vertexName], vertexName);
     }
-
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error(`Could not link shader program: ${gl.getProgramInfoLog(program)}`);
+        throw new Error("Could not link shader program: " + gl.getProgramInfoLog(program));
     }
     return program;
 }
-
 function createTextureFromImage(gl, image) {
-    let textureId = gl.createTexture();
+    var textureId = gl.createTexture();
+    if (textureId === null) {
+        throw new Error('Could not create a new WebGL texture');
+    }
     gl.bindTexture(gl.TEXTURE_2D, textureId);
-    gl.texImage2D(
-        gl.TEXTURE_2D,    // target
-        0,                // level
-        gl.RGBA,          // internalFormat
-        gl.RGBA,          // srcFormat
-        gl.UNSIGNED_BYTE, // srcType
-        image             // image
-    );
-
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
     return textureId;
 }
-
-// TODO(#54): pre-load all of the filters and just switch between them without loading/unloading them constantly
 function loadFilterProgram(gl, filter, vertexAttribs) {
-    let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
-    let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
+    var _a;
+    var vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
+    var fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
+    var id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
     gl.useProgram(id);
-
-    let uniforms = {
+    var uniforms = {
         "resolution": gl.getUniformLocation(id, 'resolution'),
         "time": gl.getUniformLocation(id, 'time'),
         "emoteSize": gl.getUniformLocation(id, 'emoteSize'),
     };
-
-    // TODO(#55): there no "reset to default" button in the params panel of a filter
-    let paramsPanel = div().att$("class", "widget-element");
-    let paramsInputs = {};
-
-    for (let paramName in filter.params) {
+    var paramsPanel = div().att$("class", "widget-element");
+    var paramsInputs = {};
+    var _loop_1 = function (paramName) {
         if (paramName in uniforms) {
-            throw new Error(`Redefinition of existing uniform parameter ${paramName}`);
+            throw new Error("Redefinition of existing uniform parameter " + paramName);
         }
-        
         switch (filter.params[paramName].type) {
-        case "float": {
-            const valuePreview = span(filter.params[paramName].init.toString());
-            const valueInput = input("range");
-
-            if (filter.params[paramName].min) {
-                valueInput.att$("min", filter.params[paramName].min);
+            case "float":
+                {
+                    var valuePreview_1 = span(filter.params[paramName].init.toString());
+                    var valueInput = input("range");
+                    if (filter.params[paramName].min) {
+                        valueInput.att$("min", filter.params[paramName].min);
+                    }
+                    if (filter.params[paramName].max) {
+                        valueInput.att$("max", filter.params[paramName].max);
+                    }
+                    if (filter.params[paramName].step) {
+                        valueInput.att$("step", filter.params[paramName].step);
+                    }
+                    if (filter.params[paramName].init) {
+                        valueInput.att$("value", filter.params[paramName].init);
+                    }
+                    paramsInputs[paramName] = valueInput;
+                    valueInput.oninput = function () {
+                        valuePreview_1.innerText = this.value;
+                        paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
+                    };
+                    var label = (_a = filter.params[paramName].label) !== null && _a !== void 0 ? _a : paramName;
+                    paramsPanel.appendChild(div(span(label + ": "), valuePreview_1, div(valueInput)));
+                }
+                break;
+            default: {
+                throw new Error("Filter parameters do not support type " + filter.params[paramName].type);
             }
-
-            if (filter.params[paramName].max) {
-                valueInput.att$("max", filter.params[paramName].max);
-            }
-
-            if (filter.params[paramName].step) {
-                valueInput.att$("step", filter.params[paramName].step);
-            }
-
-            if (filter.params[paramName].init) {
-                valueInput.att$("value", filter.params[paramName].init);
-            }
-
-            paramsInputs[paramName] = valueInput;
-
-            valueInput.oninput = function () {
-                valuePreview.innerText = this.value;
-                paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
-            };
-
-            paramsPanel.appendChild(div(
-                span(`${paramName}: `), valuePreview,
-                div(valueInput),
-            ));
-        } break;
-
-        default: {
-            throw new Error(`Filter parameters do not support type ${filter.params[paramName].type}`)
         }
-        }
-
         uniforms[paramName] = gl.getUniformLocation(id, paramName);
+    };
+    for (var paramName in filter.params) {
+        _loop_1(paramName);
     }
-
-    paramsPanel.paramsSnapshot$ = function() {
-        let snapshot = {};
-        for (let paramName in paramsInputs) {
+    paramsPanel.paramsSnapshot$ = function () {
+        var snapshot = {};
+        for (var paramName in paramsInputs) {
             snapshot[paramName] = {
                 "uniform": uniforms[paramName],
                 "value": paramsInputs[paramName].value
@@ -142,7 +124,6 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         }
         return snapshot;
     };
-
     return {
         "id": id,
         "uniforms": uniforms,
@@ -151,80 +132,63 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         "paramsPanel": paramsPanel,
     };
 }
-
 function ImageSelector() {
-    const imageInput = input().att$("type", "file");
-    const imagePreview = img("img/tsodinClown.png")
-          .att$("class", "widget-element")
-          .att$("width", CANVAS_WIDTH);
-    const root = div(
-        div(imageInput).att$("class", "widget-element"),
-        imagePreview
-    ).att$("class", "widget");
-
-    root.selectedImage$ = function() {
+    var imageInput = input("file");
+    var imagePreview = img("img/tsodinClown.png")
+        .att$("class", "widget-element")
+        .att$("width", CANVAS_WIDTH);
+    var root = div(div(imageInput).att$("class", "widget-element"), imagePreview).att$("class", "widget");
+    root.selectedImage$ = function () {
         return imagePreview;
     };
-
-    root.selectedFileName$ = function() {
+    root.selectedFileName$ = function () {
         function removeFileNameExt(fileName) {
             if (fileName.includes('.')) {
                 return fileName.split('.').slice(0, -1).join('.');
-            } else {
+            }
+            else {
                 return fileName;
             }
         }
-
-        const file = imageInput.files[0];
+        var file = imageInput.files[0];
         return file ? removeFileNameExt(file.name) : 'result';
     };
-
-    root.updateFiles$ = function(files) {
+    root.updateFiles$ = function (files) {
         imageInput.files = files;
         imageInput.onchange();
-    }
-
-    imagePreview.addEventListener('load', function() {
+    };
+    imagePreview.addEventListener('load', function () {
         root.dispatchEvent(new CustomEvent("imageSelected", {
             detail: {
                 imageData: this
             }
         }));
     });
-
-    imagePreview.addEventListener('error', function() {
+    imagePreview.addEventListener('error', function () {
         imageInput.value = '';
         this.src = 'img/error.png';
     });
-
-    imageInput.onchange = function() {
+    imageInput.onchange = function () {
         imagePreview.src = URL.createObjectURL(this.files[0]);
     };
-
     return root;
 }
-
 function FilterList() {
-    const root = select();
-
-    // Populating the FilterList
-    for (let name in filters) {
-        root.add(new Option(name));
+    var root = select();
+    for (var name_1 in filters) {
+        root.add(new Option(name_1));
     }
-
-    root.selectedFilter$ = function() {
+    root.selectedFilter$ = function () {
         return filters[root.selectedOptions[0].value];
     };
-
-    root.onchange = function() {
+    root.onchange = function () {
         root.dispatchEvent(new CustomEvent('filterChanged', {
             detail: {
                 filter: root.selectedFilter$()
             }
         }));
     };
-
-    root.addEventListener('wheel', function(e) {
+    root.addEventListener('wheel', function (e) {
         e.preventDefault();
         if (e.deltaY < 0) {
             root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
@@ -234,92 +198,66 @@ function FilterList() {
         }
         root.onchange();
     });
-
     return root;
 }
-
 function FilterSelector() {
-    const filterList_ = FilterList();
-    const filterPreview = canvas()
-          .att$("width", CANVAS_WIDTH)
-          .att$("height", CANVAS_HEIGHT);
-    const root = div(
-        div("Filter: ", filterList_)
-            .att$("class", "widget-element"),
-        filterPreview.att$("class", "widget-element"),
-    ).att$("class", "widget");
-
-    const gl = filterPreview.getContext("webgl", {antialias: false, alpha: false});
+    var filterList_ = FilterList();
+    var filterPreview = canvas()
+        .att$("width", CANVAS_WIDTH)
+        .att$("height", CANVAS_HEIGHT);
+    var root = div(div("Filter: ", filterList_)
+        .att$("class", "widget-element"), filterPreview.att$("class", "widget-element")).att$("class", "widget");
+    var gl = filterPreview.getContext("webgl", { antialias: false, alpha: false });
     if (!gl) {
         throw new Error("Could not initialize WebGL context");
     }
-
-    // Initialize GL
     {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-        // Mesh Position
         {
-            let meshPositionBufferData = new Float32Array(TRIANGLE_PAIR * TRIANGLE_VERTICIES * VEC2_COUNT);
-            for (let triangle = 0; triangle < TRIANGLE_PAIR; ++triangle) {
-                for (let vertex = 0; vertex < TRIANGLE_VERTICIES; ++vertex) {
-                    const quad = triangle + vertex;
-                    const index =
-                          triangle * TRIANGLE_VERTICIES * VEC2_COUNT +
-                          vertex * VEC2_COUNT;
+            var meshPositionBufferData = new Float32Array(TRIANGLE_PAIR * TRIANGLE_VERTICIES * VEC2_COUNT);
+            for (var triangle = 0; triangle < TRIANGLE_PAIR; ++triangle) {
+                for (var vertex = 0; vertex < TRIANGLE_VERTICIES; ++vertex) {
+                    var quad = triangle + vertex;
+                    var index = triangle * TRIANGLE_VERTICIES * VEC2_COUNT +
+                        vertex * VEC2_COUNT;
                     meshPositionBufferData[index + VEC2_X] = (2 * (quad & 1) - 1);
                     meshPositionBufferData[index + VEC2_Y] = (2 * ((quad >> 1) & 1) - 1);
                 }
             }
-
-            let meshPositionBuffer = gl.createBuffer();
+            var meshPositionBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, meshPositionBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, meshPositionBufferData, gl.STATIC_DRAW);
-
-            const meshPositionAttrib = vertexAttribs['meshPosition'];
-            gl.vertexAttribPointer(
-                meshPositionAttrib,
-                VEC2_COUNT,
-                gl.FLOAT,
-                false,
-                0,
-                0);
+            var meshPositionAttrib = vertexAttribs['meshPosition'];
+            gl.vertexAttribPointer(meshPositionAttrib, VEC2_COUNT, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(meshPositionAttrib);
         }
     }
-
-    // TODO(#49): FilterSelector does not handle loadFilterProgram() failures
-
-    let emoteImage = undefined;
-    let emoteTexture = undefined;
-    let program = undefined;
-
+    var emoteImage = undefined;
+    var emoteTexture = undefined;
+    var program = undefined;
     function syncParams() {
         if (program) {
-            const snapshot = program.paramsPanel.paramsSnapshot$();
-            for (let paramName in snapshot) {
+            var snapshot = program.paramsPanel.paramsSnapshot$();
+            for (var paramName in snapshot) {
                 gl.uniform1f(snapshot[paramName].uniform, snapshot[paramName].value);
             }
         }
     }
-
     program = loadFilterProgram(gl, filterList_.selectedFilter$(), vertexAttribs);
     program.paramsPanel.addEventListener('paramsChanged', syncParams);
     if (feature_params) {
         root.appendChild(program.paramsPanel);
     }
     syncParams();
-
-    root.updateImage$ = function(newEmoteImage) {
+    root.updateImage$ = function (newEmoteImage) {
         emoteImage = newEmoteImage;
         if (emoteTexture) {
             gl.deleteTexture(emoteTexture);
         }
         emoteTexture = createTextureFromImage(gl, emoteImage);
     };
-
-    filterList_.addEventListener('filterChanged', function(e) {
+    filterList_.addEventListener('filterChanged', function (e) {
         if (program) {
             gl.deleteProgram(program.id);
             program.paramsPanel.removeEventListener('paramsChanged', syncParams);
@@ -327,7 +265,6 @@ function FilterSelector() {
                 root.removeChild(program.paramsPanel);
             }
         }
-
         program = loadFilterProgram(gl, e.detail.filter, vertexAttribs);
         program.paramsPanel.addEventListener('paramsChanged', syncParams);
         if (feature_params) {
@@ -335,8 +272,15 @@ function FilterSelector() {
         }
         syncParams();
     });
-
     root.render$ = function (filename) {
+        if (program === undefined) {
+            console.warn('Could not rendering anything because the filter was not selected');
+            return undefined;
+        }
+        if (emoteImage == undefined) {
+            console.warn('Could not rendering anything because the image was not selected');
+            return undefined;
+        }
         var gif = new GIF({
             workers: 5,
             quality: 10,
@@ -344,150 +288,134 @@ function FilterSelector() {
             height: CANVAS_HEIGHT,
             transparent: program.transparent,
         });
-
-        const context = {
+        var context = {
             "vars": {
                 "Math.PI": Math.PI
             }
         };
-        {
-            console.assert(program);
-            const snapshot = program.paramsPanel.paramsSnapshot$();
-            for (let paramName in snapshot) {
+        if (context.vars !== undefined) {
+            var snapshot = program.paramsPanel.paramsSnapshot$();
+            for (var paramName in snapshot) {
                 context.vars[paramName] = snapshot[paramName].value;
             }
         }
-
-        const fps = 30;
-        const dt = 1.0 / fps;
-        // TODO(#59): come up with a reasonable way to handle malicious durations
-        const duration = Math.min(run_expr(program.duration, context), 60);
-        const frameCount = 100;
-
-        const renderProgress = document.getElementById("render-progress");
-        const renderSpinner = document.getElementById("render-spinner");
-        const renderPreview = document.getElementById("render-preview");
-        const renderDownload = document.getElementById("render-download");
-
+        var fps = 30;
+        var dt = 1.0 / fps;
+        var duration = Math.min(run_expr(program.duration, context), 60);
+        var renderProgress = document.getElementById("render-progress");
+        if (renderProgress === null) {
+            throw new Error('Could not find "render-progress"');
+        }
+        var renderSpinner = document.getElementById("render-spinner");
+        if (renderSpinner === null) {
+            throw new Error('Could not find "render-spinner"');
+        }
+        var renderPreview = document.getElementById("render-preview");
+        if (renderPreview === null) {
+            throw new Error('Could not find "render-preview"');
+        }
+        var renderDownload = document.getElementById("render-download");
+        if (renderDownload === null) {
+            throw new Error('Could not find "render-download"');
+        }
         renderPreview.style.display = "none";
         renderSpinner.style.display = "block";
-
-        let t = 0.0;
+        var t = 0.0;
         while (t <= duration) {
             gl.uniform1f(program.uniforms.time, t);
             gl.uniform2f(program.uniforms.resolution, CANVAS_WIDTH, CANVAS_HEIGHT);
             gl.uniform2f(program.uniforms.emoteSize, emoteImage.width, emoteImage.height);
-
             gl.clearColor(0.0, 1.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
-
-            let pixels = new Uint8ClampedArray(4 * CANVAS_WIDTH * CANVAS_HEIGHT);
+            var pixels = new Uint8ClampedArray(4 * CANVAS_WIDTH * CANVAS_HEIGHT);
             gl.readPixels(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-            // Flip the image vertically
             {
-                const center = Math.floor(CANVAS_HEIGHT / 2);
-                for (let y = 0; y < center; ++y) {
-                    const row = 4 * CANVAS_WIDTH;
-                    for (let x = 0; x < row; ++x) {
-                        const ai = y * 4 * CANVAS_WIDTH + x;
-                        const bi = (CANVAS_HEIGHT - y - 1) * 4 * CANVAS_WIDTH + x;
-                        const a = pixels[ai];
-                        const b = pixels[bi];
+                var center = Math.floor(CANVAS_HEIGHT / 2);
+                for (var y = 0; y < center; ++y) {
+                    var row = 4 * CANVAS_WIDTH;
+                    for (var x = 0; x < row; ++x) {
+                        var ai = y * 4 * CANVAS_WIDTH + x;
+                        var bi = (CANVAS_HEIGHT - y - 1) * 4 * CANVAS_WIDTH + x;
+                        var a_1 = pixels[ai];
+                        var b = pixels[bi];
                         pixels[ai] = b;
-                        pixels[bi] = a;
+                        pixels[bi] = a_1;
                     }
                 }
             }
-
             gif.addFrame(new ImageData(pixels, CANVAS_WIDTH, CANVAS_HEIGHT), {
                 delay: dt * 1000,
                 dispose: 2,
             });
-
-            renderProgress.style.width = `${(t / duration) * 50}%`;
-
+            renderProgress.style.width = (t / duration) * 50 + "%";
             t += dt;
         }
-
-        gif.on('finished', (blob) => {
+        gif.on('finished', function (blob) {
             renderPreview.src = URL.createObjectURL(blob);
             renderPreview.style.display = "block";
             renderDownload.href = renderPreview.src;
             renderDownload.download = filename;
             renderDownload.style.display = "block";
             renderSpinner.style.display = "none";
-
         });
-
-        gif.on('progress', (p) => {
-            renderProgress.style.width = `${50 + p * 50}%`;
+        gif.on('progress', function (p) {
+            renderProgress.style.width = 50 + p * 50 + "%";
         });
-
         gif.render();
-
         return gif;
     };
-
-    // Rendering Loop
     {
-        let start;
-        function step(timestamp) {
-            if (start === undefined) {
-                start = timestamp;
-            }
-            const dt = (timestamp - start) * 0.001;
-            start = timestamp;
-            
+        var step_1 = function (timestamp) {
             gl.clearColor(0.0, 1.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
-
             if (program && emoteImage) {
-                gl.uniform1f(program.uniforms.time, start * 0.001);
+                gl.uniform1f(program.uniforms.time, timestamp * 0.001);
                 gl.uniform2f(program.uniforms.resolution, filterPreview.width, filterPreview.height);
                 gl.uniform2f(program.uniforms.emoteSize, emoteImage.width, emoteImage.height);
-
                 gl.drawArrays(gl.TRIANGLES, 0, TRIANGLE_PAIR * TRIANGLE_VERTICIES);
             }
-
-            window.requestAnimationFrame(step);
-        }
-        window.requestAnimationFrame(step);
+            window.requestAnimationFrame(step_1);
+        };
+        window.requestAnimationFrame(step_1);
     }
-
     return root;
 }
-
-window.onload = () => {
+window.onload = function () {
     feature_params = new URLSearchParams(document.location.search).has("feature-params");
-
-    const imageSelector = ImageSelector();
-    const filterSelector = FilterSelector();
-    imageSelector.addEventListener('imageSelected', function(e) {
+    var filterSelectorEntry = document.getElementById('filter-selector-entry');
+    if (filterSelectorEntry === null) {
+        throw new Error('Could not find "filter-selector-entry"');
+    }
+    var imageSelectorEntry = document.getElementById('image-selector-entry');
+    if (imageSelectorEntry === null) {
+        throw new Error('Could not find "image-selector-entry"');
+    }
+    var imageSelector = ImageSelector();
+    var filterSelector = FilterSelector();
+    imageSelector.addEventListener('imageSelected', function (e) {
         filterSelector.updateImage$(e.detail.imageData);
     });
     filterSelectorEntry.appendChild(filterSelector);
     imageSelectorEntry.appendChild(imageSelector);
-
-    // drag file from anywhere
-    document.ondrop = function(event) {
+    document.ondrop = function (event) {
+        var _a;
         event.preventDefault();
-        imageSelector.updateFiles$(event.dataTransfer.files);
-    }
-
-    document.ondragover = function(event) {
+        imageSelector.updateFiles$((_a = event.dataTransfer) === null || _a === void 0 ? void 0 : _a.files);
+    };
+    document.ondragover = function (event) {
         event.preventDefault();
+    };
+    var gif = undefined;
+    var renderButton = document.getElementById("render");
+    if (renderButton === null) {
+        throw new Error('Could not find "render"');
     }
-
-    // TODO(#50): extract "renderer" as a separate grecha.js component
-    // Similar to imageSelector and filterSelector
-    let gif = undefined;
-    const renderButton = document.querySelector("#render");
-    renderButton.onclick = function() {
+    renderButton.onclick = function () {
         if (gif && gif.running) {
             gif.abort();
         }
-        const fileName = imageSelector.selectedFileName$();
-        gif = filterSelector.render$(`${fileName}.gif`);
+        var fileName = imageSelector.selectedFileName$();
+        gif = filterSelector.render$(fileName + ".gif");
     };
-}
+};
