@@ -187,7 +187,7 @@ function parse(lexer: Lexer): Expr {
     return lhs;
 }
 
-function compile_expr(src: string) {
+function compile_expr(src: string): Expr {
     const lexer = new Lexer(src);
     const result = parse(lexer);
     const token = lexer.next();
@@ -258,3 +258,4 @@ function run_expr(expr: Expr, user_context: UserContext = {}): number {
     }
     }
 }
+
