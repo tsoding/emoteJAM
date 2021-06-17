@@ -1,12 +1,38 @@
 type BinaryOp = '+' | '-' | '*' | '/' | '%';
 type BinaryOpFunc = (lhs: number, rhs: number) => number;
 
-const BINARY_OPS: {[op in BinaryOp]: BinaryOpFunc} = {
-    '+': (lhs, rhs) => lhs + rhs,
-    '-': (lhs, rhs) => lhs - rhs,
-    '*': (lhs, rhs) => lhs * rhs,
-    '/': (lhs, rhs) => lhs / rhs,
-    '%': (lhs, rhs) => lhs % rhs,
+enum BinaryPrec {
+    PREC0 = 0,
+    PREC1,
+    COUNT_PRECS
+}
+
+interface BinaryOpDef {
+    func: BinaryOpFunc,
+    prec: BinaryPrec
+}
+
+const BINARY_OPS: {[op in BinaryOp]: BinaryOpDef} = {
+    '+': {
+        func: (lhs, rhs) => lhs + rhs,
+        prec: BinaryPrec.PREC0
+    },
+    '-': {
+        func: (lhs, rhs) => lhs - rhs,
+        prec: BinaryPrec.PREC0
+    },
+    '*': {
+        func: (lhs, rhs) => lhs * rhs,
+        prec: BinaryPrec.PREC1
+    },
+    '/': {
+        func: (lhs, rhs) => lhs / rhs,
+        prec: BinaryPrec.PREC1
+    },
+    '%': {
+        func: (lhs, rhs) => lhs % rhs,
+        prec: BinaryPrec.PREC1
+    }
 };
 
 type UnaryOp = '-';
@@ -90,7 +116,7 @@ function parse_primary(lexer: Lexer): Expr {
     let token = lexer.next();
     if (token !== null) {
         if (token in UNARY_OPS) {
-            let operand = parse(lexer);
+            let operand = parse_expr(lexer);
             return {
                 "kind": "unary_op",
                 "payload": {
@@ -99,7 +125,7 @@ function parse_primary(lexer: Lexer): Expr {
                 },
             };
         } else if (token === '(') {
-            let expr = parse(lexer);
+            let expr = parse_expr(lexer);
             token = lexer.next();
             if (token !== ')') {
                 throw new Error(`Expected ')' but got '${token}'`);
@@ -128,11 +154,11 @@ function parse_primary(lexer: Lexer): Expr {
                 }
 
                 lexer.unnext(next_token);
-                args.push(parse(lexer));
+                args.push(parse_expr(lexer));
 
                 next_token = lexer.next();
                 while (next_token == ',') {
-                    args.push(parse(lexer));
+                    args.push(parse_expr(lexer));
                     next_token = lexer.next();
                 }
 
@@ -164,13 +190,17 @@ function parse_primary(lexer: Lexer): Expr {
     }
 }
 
-function parse(lexer: Lexer): Expr {
-    let lhs = parse_primary(lexer);
+function parse_expr(lexer: Lexer, prec: BinaryPrec = BinaryPrec.PREC0): Expr {
+    if (prec >= BinaryPrec.COUNT_PRECS) {
+        return parse_primary(lexer);
+    }
+
+    let lhs = parse_expr(lexer, prec + 1);
 
     let op_token = lexer.next();
     if (op_token !== null) {
-        if (op_token in BINARY_OPS) {
-            let rhs = parse(lexer);
+        if (op_token in BINARY_OPS && BINARY_OPS[op_token as BinaryOp].prec == prec) {
+            let rhs = parse_expr(lexer, prec);
             return {
                 "kind": "binary_op",
                 "payload": {
@@ -189,7 +219,7 @@ function parse(lexer: Lexer): Expr {
 
 function compile_expr(src: string): Expr {
     const lexer = new Lexer(src);
-    const result = parse(lexer);
+    const result = parse_expr(lexer);
     const token = lexer.next();
     if (token !== null) {
         console.log(typeof(token));
@@ -237,7 +267,9 @@ function run_expr(expr: Expr, user_context: UserContext = {}): number {
         const binary_op = expr.payload as BinaryOpExpr;
 
         if (binary_op.op in BINARY_OPS) {
-            return BINARY_OPS[binary_op.op](run_expr(binary_op.lhs, user_context), run_expr(binary_op.rhs, user_context));
+            return BINARY_OPS[binary_op.op].func(
+                run_expr(binary_op.lhs, user_context),
+                run_expr(binary_op.rhs, user_context));
         }
 
         throw new Error(`Unknown binary operator '${binary_op.op}'`);
@@ -258,4 +290,3 @@ function run_expr(expr: Expr, user_context: UserContext = {}): number {
     }
     }
 }
-

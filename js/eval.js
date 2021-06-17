@@ -1,10 +1,31 @@
 "use strict";
+var BinaryPrec;
+(function (BinaryPrec) {
+    BinaryPrec[BinaryPrec["PREC0"] = 0] = "PREC0";
+    BinaryPrec[BinaryPrec["PREC1"] = 1] = "PREC1";
+    BinaryPrec[BinaryPrec["COUNT_PRECS"] = 2] = "COUNT_PRECS";
+})(BinaryPrec || (BinaryPrec = {}));
 var BINARY_OPS = {
-    '+': function (lhs, rhs) { return lhs + rhs; },
-    '-': function (lhs, rhs) { return lhs - rhs; },
-    '*': function (lhs, rhs) { return lhs * rhs; },
-    '/': function (lhs, rhs) { return lhs / rhs; },
-    '%': function (lhs, rhs) { return lhs % rhs; },
+    '+': {
+        func: function (lhs, rhs) { return lhs + rhs; },
+        prec: BinaryPrec.PREC0
+    },
+    '-': {
+        func: function (lhs, rhs) { return lhs - rhs; },
+        prec: BinaryPrec.PREC0
+    },
+    '*': {
+        func: function (lhs, rhs) { return lhs * rhs; },
+        prec: BinaryPrec.PREC1
+    },
+    '/': {
+        func: function (lhs, rhs) { return lhs / rhs; },
+        prec: BinaryPrec.PREC1
+    },
+    '%': {
+        func: function (lhs, rhs) { return lhs % rhs; },
+        prec: BinaryPrec.PREC1
+    }
 };
 var UNARY_OPS = {
     '-': function (arg) { return -arg; },
@@ -47,7 +68,7 @@ function parse_primary(lexer) {
     var token = lexer.next();
     if (token !== null) {
         if (token in UNARY_OPS) {
-            var operand = parse(lexer);
+            var operand = parse_expr(lexer);
             return {
                 "kind": "unary_op",
                 "payload": {
@@ -57,7 +78,7 @@ function parse_primary(lexer) {
             };
         }
         else if (token === '(') {
-            var expr = parse(lexer);
+            var expr = parse_expr(lexer);
             token = lexer.next();
             if (token !== ')') {
                 throw new Error("Expected ')' but got '" + token + "'");
@@ -85,10 +106,10 @@ function parse_primary(lexer) {
                     throw Error("Unexpected end of input");
                 }
                 lexer.unnext(next_token);
-                args.push(parse(lexer));
+                args.push(parse_expr(lexer));
                 next_token = lexer.next();
                 while (next_token == ',') {
-                    args.push(parse(lexer));
+                    args.push(parse_expr(lexer));
                     next_token = lexer.next();
                 }
                 if (next_token !== ')') {
@@ -119,12 +140,16 @@ function parse_primary(lexer) {
         throw new Error('Expected primary expression but reached the end of the input');
     }
 }
-function parse(lexer) {
-    var lhs = parse_primary(lexer);
+function parse_expr(lexer, prec) {
+    if (prec === void 0) { prec = BinaryPrec.PREC0; }
+    if (prec >= BinaryPrec.COUNT_PRECS) {
+        return parse_primary(lexer);
+    }
+    var lhs = parse_expr(lexer, prec + 1);
     var op_token = lexer.next();
     if (op_token !== null) {
-        if (op_token in BINARY_OPS) {
-            var rhs = parse(lexer);
+        if (op_token in BINARY_OPS && BINARY_OPS[op_token].prec == prec) {
+            var rhs = parse_expr(lexer, prec);
             return {
                 "kind": "binary_op",
                 "payload": {
@@ -142,7 +167,7 @@ function parse(lexer) {
 }
 function compile_expr(src) {
     var lexer = new Lexer(src);
-    var result = parse(lexer);
+    var result = parse_expr(lexer);
     var token = lexer.next();
     if (token !== null) {
         console.log(typeof (token));
@@ -180,7 +205,7 @@ function run_expr(expr, user_context) {
         case 'binary_op': {
             var binary_op = expr.payload;
             if (binary_op.op in BINARY_OPS) {
-                return BINARY_OPS[binary_op.op](run_expr(binary_op.lhs, user_context), run_expr(binary_op.rhs, user_context));
+                return BINARY_OPS[binary_op.op].func(run_expr(binary_op.lhs, user_context), run_expr(binary_op.rhs, user_context));
             }
             throw new Error("Unknown binary operator '" + binary_op.op + "'");
         }
