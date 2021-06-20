@@ -17,6 +17,13 @@ $ python3 -m http.server 6969
 $ iexplore.exe http://localhost:6969/
 ```
 
+## Building JavaScript files
+
+```console
+$ npm install
+$ ./node_modules/.bin/tsc
+```
+
 # Filter Development
 
 **WARNING! Knowledge of [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) or [OpenGL](https://www.opengl.org/) is required to read this section!**
