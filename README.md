@@ -17,6 +17,14 @@ $ python3 -m http.server 6969
 $ iexplore.exe http://localhost:6969/
 ```
 
+## Development Workflow
+
+1. `$ npm install`
+2. `$ ./node_modules/.bin/tsc -w`
+3. `<edit files>`
+
+Make sure that you commit the generated `js/*` files along with your changes. This is important for the project to retain that "Just deploy the repo" attitude.
+
 # Filter Development
 
 **WARNING! Knowledge of [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) or [OpenGL](https://www.opengl.org/) is required to read this section!**

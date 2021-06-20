@@ -11,3 +11,4 @@ jobs:
           node-version: '13'
       - run: npm install
       - run: ./node_modules/.bin/tsc
+      - run: git diff --exit-code
