@@ -12,9 +12,6 @@ interface BinaryOpDef {
     prec: BinaryPrec
 }
 
-function f() {
-}
-
 const BINARY_OPS: {[op in BinaryOp]: BinaryOpDef} = {
     '+': {
         func: (lhs, rhs) => lhs + rhs,
