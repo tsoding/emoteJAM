@@ -2,7 +2,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build-linux-gcc:
+  node-13-typescript:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
