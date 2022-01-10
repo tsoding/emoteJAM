@@ -118,7 +118,7 @@ function loadFilterProgram(gl: WebGLRenderingContext, filter: Filter, vertexAttr
 
     // TODO(#55): there no "reset to default" button in the params panel of a filter
     let paramsPanel = div().att$("class", "widget-element");
-    let paramsInputs: {[name: string]: Tag} = {};
+    let paramsInputs: {[name: string]: Tag<HTMLInputElement>} = {};
 
     for (let paramName in filter.params) {
         if (paramName in uniforms) {
@@ -131,25 +131,25 @@ function loadFilterProgram(gl: WebGLRenderingContext, filter: Filter, vertexAttr
             const valueInput = input("range");
 
             if (filter.params[paramName].min !== undefined) {
-                valueInput.att$("min", filter.params[paramName].min);
+                valueInput.att$("min", filter.params[paramName].min!.toString());
             }
 
             if (filter.params[paramName].max !== undefined) {
-                valueInput.att$("max", filter.params[paramName].max);
+                valueInput.att$("max", filter.params[paramName].max!.toString());
             }
 
             if (filter.params[paramName].step !== undefined) {
-                valueInput.att$("step", filter.params[paramName].step);
+                valueInput.att$("step", filter.params[paramName].step!.toString());
             }
 
             if (filter.params[paramName].init !== undefined) {
-                valueInput.att$("value", filter.params[paramName].init);
+                valueInput.att$("value", filter.params[paramName].init!.toString());
             }
 
             paramsInputs[paramName] = valueInput;
 
-            valueInput.oninput = function () {
-                valuePreview.innerText = this.value;
+            valueInput.oninput = function (e) {
+                valuePreview.innerText = (e.currentTarget as HTMLInputElement).value;
                 paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
             };
 
@@ -194,7 +194,7 @@ function ImageSelector() {
     const imageInput = input("file");
     const imagePreview = img("img/tsodinClown.png")
           .att$("class", "widget-element")
-          .att$("width", CANVAS_WIDTH);
+          .att$("width", String(CANVAS_WIDTH));
     const root = div(
         div(imageInput).att$("class", "widget-element"),
         imagePreview
@@ -213,13 +213,13 @@ function ImageSelector() {
             }
         }
 
-        const file = imageInput.files[0];
+        const file = imageInput.files![0];
         return file ? removeFileNameExt(file.name) : 'result';
     };
 
     root.updateFiles$ = function(files: FileList) {
         imageInput.files = files;
-        imageInput.onchange();
+        imageInput.dispatchEvent(new UIEvent("change", { view: window, bubbles: true }));
     }
 
     imagePreview.addEventListener('load', function(this: HTMLImageElement) {
@@ -235,8 +235,8 @@ function ImageSelector() {
         this.src = 'img/error.png';
     });
 
-    imageInput.onchange = function() {
-        imagePreview.src = URL.createObjectURL(this.files[0]);
+    imageInput.onchange = function(e) {
+        imagePreview.src = URL.createObjectURL((e.currentTarget as HTMLInputElement).files![0]);
     };
 
     return root;
@@ -270,7 +270,7 @@ function FilterList() {
         if (e.deltaY > 0) {
             root.selectedIndex = Math.min(root.selectedIndex + 1, root.length - 1);
         }
-        root.onchange();
+        root.dispatchEvent(new UIEvent("change", { view: window, bubbles: true }));
     });
 
     return root;
@@ -279,8 +279,8 @@ function FilterList() {
 function FilterSelector() {
     const filterList_ = FilterList();
     const filterPreview = canvas()
-          .att$("width", CANVAS_WIDTH)
-          .att$("height", CANVAS_HEIGHT);
+          .att$("width", String(CANVAS_WIDTH))
+          .att$("height", String(CANVAS_HEIGHT));
     const root = div(
         div("Filter: ", filterList_)
             .att$("class", "widget-element"),
@@ -337,7 +337,7 @@ function FilterSelector() {
         if (program) {
             const snapshot = program.paramsPanel.paramsSnapshot$();
             for (let paramName in snapshot) {
-                gl.uniform1f(snapshot[paramName].uniform, snapshot[paramName].value);
+                gl!.uniform1f(snapshot[paramName].uniform, snapshot[paramName].value);
             }
         }
     }
@@ -527,7 +527,7 @@ window.onload = () => {
     const filterSelector = FilterSelector();
     imageSelector.addEventListener('imageSelected', function(e: CustomEvent) {
         filterSelector.updateImage$(e.detail.imageData);
-    });
+    } as EventListener);
     filterSelectorEntry.appendChild(filterSelector);
     imageSelectorEntry.appendChild(imageSelector);
 
