@@ -102,9 +102,13 @@ interface Snapshot {
 }
 
 // TODO(#54): pre-load all of the filters and just switch between them without loading/unloading them constantly
+// TODO Deprecate string and move to fetchers
+// TODO move to async version of fetchers
 function loadFilterProgram(gl: WebGLRenderingContext, filter: Filter, vertexAttribs: VertexAttribs): CompiledFilter {
-    let vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
-    let fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
+    let vertexShaderSource = filter.vertex instanceof VertexShaderFetcher ? filter.vertex.GetShader() : filter.vertex; 
+    let fragmentShaderSource = filter.fragment instanceof FragmentShaderFetcher ? filter.fragment.GetShader() : filter.fragment; 
+    let vertexShader = compileShaderSource(gl, vertexShaderSource, gl.VERTEX_SHADER);
+    let fragmentShader = compileShaderSource(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
     let id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);

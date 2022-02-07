@@ -62,8 +62,10 @@ function createTextureFromImage(gl, image) {
 }
 function loadFilterProgram(gl, filter, vertexAttribs) {
     var _a;
-    var vertexShader = compileShaderSource(gl, filter.vertex, gl.VERTEX_SHADER);
-    var fragmentShader = compileShaderSource(gl, filter.fragment, gl.FRAGMENT_SHADER);
+    var vertexShaderSource = filter.vertex instanceof VertexShaderFetcher ? filter.vertex.GetShader() : filter.vertex;
+    var fragmentShaderSource = filter.fragment instanceof FragmentShaderFetcher ? filter.fragment.GetShader() : filter.fragment;
+    var vertexShader = compileShaderSource(gl, vertexShaderSource, gl.VERTEX_SHADER);
+    var fragmentShader = compileShaderSource(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
     var id = linkShaderProgram(gl, [vertexShader, fragmentShader], vertexAttribs);
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
