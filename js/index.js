@@ -382,7 +382,21 @@ function FilterSelector() {
     return root;
 }
 window.onload = function () {
-    feature_params = new URLSearchParams(document.location.search).has("feature-params");
+    if (URLSearchParams) {
+        feature_params = new URLSearchParams(document.location.search).has("feature-params");
+    }
+    else {
+        var query = document.location.toString().split('?')[1];
+        feature_params = false;
+        if (query) {
+            for (var _i = 0, _a = query.split('&'); _i < _a.length; _i++) {
+                var el = _a[_i];
+                if (el === "feature-params") {
+                    feature_params = true;
+                }
+            }
+        }
+    }
     var filterSelectorEntry = document.getElementById('filter-selector-entry');
     if (filterSelectorEntry === null) {
         throw new Error('Could not find "filter-selector-entry"');
