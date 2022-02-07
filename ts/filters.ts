@@ -1015,5 +1015,76 @@ void main() {
     gl_FragColor = pixel * vec4(vec3(1.0), mask);
 }
 `,
+    },
+    "Ripple": {
+        "transparent": 0x00FF00 + "",
+        "duration": "2 * Math.PI / b",
+        "params": {
+            "a": {
+                "label": "Wave Length",
+                "type": "float",
+                "init": 12.0,
+                "min": 0.01,
+                "max": 24.0,
+                "step": 0.01,
+            },
+            "b": {
+                "label": "Time Freq",
+                "type": "float",
+                "init": 4.0,
+                "min": 0.01,
+                "max": 8.0,
+                "step": 0.01,
+            },
+            "c": {
+                "label": "Amplitude",
+                "type": "float",
+                "init": 0.03,
+                "min": 0.01,
+                "max": 0.06,
+                "step": 0.01,
+            }
+        },
+        "vertex": `#version 100
+precision mediump float;
+
+attribute vec2 meshPosition;
+
+uniform vec2 resolution;
+uniform float time;
+
+varying vec2 uv;
+
+void main() {
+    gl_Position = vec4(meshPosition, 0.0, 1.0);
+    uv = (meshPosition + 1.0) / 2.0;
+}
+`,
+        "fragment": `#version 100
+
+precision mediump float;
+
+uniform vec2 resolution;
+uniform float time;
+
+uniform sampler2D emote;
+
+uniform float a;
+uniform float b;
+uniform float c;
+
+varying vec2 uv;
+
+void main() {
+    vec2 pos = vec2(uv.x, 1.0 - uv.y);
+    vec2 center = vec2(0.5);
+    vec2 dir = pos - center;
+    float x = length(dir);
+    float y = sin(x + time);
+    vec4 pixel = texture2D(emote, pos + cos(x*a - time*b)*c*(dir/x));
+    gl_FragColor = pixel;
+    gl_FragColor.w = floor(gl_FragColor.w + 0.5);
+}
+`,
     }
 };
