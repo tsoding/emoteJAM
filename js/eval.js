@@ -81,7 +81,7 @@ function parse_primary(lexer) {
             var expr = parse_expr(lexer);
             token = lexer.next();
             if (token !== ')') {
-                throw new Error("Expected ')' but got '" + token + "'");
+                throw new Error("Expected ')' but got '".concat(token, "'"));
             }
             return expr;
         }
@@ -113,7 +113,7 @@ function parse_primary(lexer) {
                     next_token = lexer.next();
                 }
                 if (next_token !== ')') {
-                    throw Error("Expected ')' but got '" + next_token + "'");
+                    throw Error("Expected ')' but got '".concat(next_token, "'"));
                 }
                 return {
                     "kind": "funcall",
@@ -172,7 +172,7 @@ function compile_expr(src) {
     if (token !== null) {
         console.log(typeof (token));
         console.log(token);
-        throw new Error("Unexpected token '" + token + "'");
+        throw new Error("Unexpected token '".concat(token, "'"));
     }
     return result;
 }
@@ -189,7 +189,7 @@ function run_expr(expr, user_context) {
                 if (user_context.vars && value in user_context.vars) {
                     return user_context.vars[value];
                 }
-                throw new Error("Unknown variable '" + value + "'");
+                throw new Error("Unknown variable '".concat(value, "'"));
             }
             else {
                 return number;
@@ -200,24 +200,24 @@ function run_expr(expr, user_context) {
             if (unary_op.op in UNARY_OPS) {
                 return UNARY_OPS[unary_op.op](run_expr(unary_op.operand, user_context));
             }
-            throw new Error("Unknown unary operator '" + unary_op.op + "'");
+            throw new Error("Unknown unary operator '".concat(unary_op.op, "'"));
         }
         case 'binary_op': {
             var binary_op = expr.payload;
             if (binary_op.op in BINARY_OPS) {
                 return BINARY_OPS[binary_op.op].func(run_expr(binary_op.lhs, user_context), run_expr(binary_op.rhs, user_context));
             }
-            throw new Error("Unknown binary operator '" + binary_op.op + "'");
+            throw new Error("Unknown binary operator '".concat(binary_op.op, "'"));
         }
         case 'funcall': {
             var funcall = expr.payload;
             if (user_context.funcs && funcall.name in user_context.funcs) {
                 return (_a = user_context.funcs)[funcall.name].apply(_a, funcall.args.map(function (arg) { return run_expr(arg, user_context); }));
             }
-            throw new Error("Unknown function '" + funcall.name + "'");
+            throw new Error("Unknown function '".concat(funcall.name, "'"));
         }
         default: {
-            throw new Error("Unexpected AST node '" + expr.kind + "'");
+            throw new Error("Unexpected AST node '".concat(expr.kind, "'"));
         }
     }
 }

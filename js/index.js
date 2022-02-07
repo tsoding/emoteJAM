@@ -25,7 +25,7 @@ function compileShaderSource(gl, source, shaderType) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw new Error("Could not compile " + shaderTypeToString() + " shader: " + gl.getShaderInfoLog(shader));
+        throw new Error("Could not compile ".concat(shaderTypeToString(), " shader: ").concat(gl.getShaderInfoLog(shader)));
     }
     return shader;
 }
@@ -43,7 +43,7 @@ function linkShaderProgram(gl, shaders, vertexAttribs) {
     }
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error("Could not link shader program: " + gl.getProgramInfoLog(program));
+        throw new Error("Could not link shader program: ".concat(gl.getProgramInfoLog(program)));
     }
     return program;
 }
@@ -77,7 +77,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
     var paramsInputs = {};
     var _loop_1 = function (paramName) {
         if (paramName in uniforms) {
-            throw new Error("Redefinition of existing uniform parameter " + paramName);
+            throw new Error("Redefinition of existing uniform parameter ".concat(paramName));
         }
         switch (filter.params[paramName].type) {
             case "float":
@@ -85,28 +85,28 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
                     var valuePreview_1 = span(filter.params[paramName].init.toString());
                     var valueInput = input("range");
                     if (filter.params[paramName].min !== undefined) {
-                        valueInput.att$("min", filter.params[paramName].min);
+                        valueInput.att$("min", filter.params[paramName].min.toString());
                     }
                     if (filter.params[paramName].max !== undefined) {
-                        valueInput.att$("max", filter.params[paramName].max);
+                        valueInput.att$("max", filter.params[paramName].max.toString());
                     }
                     if (filter.params[paramName].step !== undefined) {
-                        valueInput.att$("step", filter.params[paramName].step);
+                        valueInput.att$("step", filter.params[paramName].step.toString());
                     }
                     if (filter.params[paramName].init !== undefined) {
-                        valueInput.att$("value", filter.params[paramName].init);
+                        valueInput.att$("value", filter.params[paramName].init.toString());
                     }
                     paramsInputs[paramName] = valueInput;
-                    valueInput.oninput = function () {
-                        valuePreview_1.innerText = this.value;
+                    valueInput.oninput = function (e) {
+                        valuePreview_1.innerText = e.currentTarget.value;
                         paramsPanel.dispatchEvent(new CustomEvent("paramsChanged"));
                     };
                     var label = (_a = filter.params[paramName].label) !== null && _a !== void 0 ? _a : paramName;
-                    paramsPanel.appendChild(div(span(label + ": "), valuePreview_1, div(valueInput)));
+                    paramsPanel.appendChild(div(span("".concat(label, ": ")), valuePreview_1, div(valueInput)));
                 }
                 break;
             default: {
-                throw new Error("Filter parameters do not support type " + filter.params[paramName].type);
+                throw new Error("Filter parameters do not support type ".concat(filter.params[paramName].type));
             }
         }
         uniforms[paramName] = gl.getUniformLocation(id, paramName);
@@ -136,7 +136,7 @@ function ImageSelector() {
     var imageInput = input("file");
     var imagePreview = img("img/tsodinClown.png")
         .att$("class", "widget-element")
-        .att$("width", CANVAS_WIDTH);
+        .att$("width", String(CANVAS_WIDTH));
     var root = div(div(imageInput).att$("class", "widget-element"), imagePreview).att$("class", "widget");
     root.selectedImage$ = function () {
         return imagePreview;
@@ -155,7 +155,7 @@ function ImageSelector() {
     };
     root.updateFiles$ = function (files) {
         imageInput.files = files;
-        imageInput.onchange();
+        imageInput.dispatchEvent(new UIEvent("change", { view: window, bubbles: true }));
     };
     imagePreview.addEventListener('load', function () {
         root.dispatchEvent(new CustomEvent("imageSelected", {
@@ -168,8 +168,8 @@ function ImageSelector() {
         imageInput.value = '';
         this.src = 'img/error.png';
     });
-    imageInput.onchange = function () {
-        imagePreview.src = URL.createObjectURL(this.files[0]);
+    imageInput.onchange = function (e) {
+        imagePreview.src = URL.createObjectURL(e.currentTarget.files[0]);
     };
     return root;
 }
@@ -196,15 +196,15 @@ function FilterList() {
         if (e.deltaY > 0) {
             root.selectedIndex = Math.min(root.selectedIndex + 1, root.length - 1);
         }
-        root.onchange();
+        root.dispatchEvent(new UIEvent("change", { view: window, bubbles: true }));
     });
     return root;
 }
 function FilterSelector() {
     var filterList_ = FilterList();
     var filterPreview = canvas()
-        .att$("width", CANVAS_WIDTH)
-        .att$("height", CANVAS_HEIGHT);
+        .att$("width", String(CANVAS_WIDTH))
+        .att$("height", String(CANVAS_HEIGHT));
     var root = div(div("Filter: ", filterList_)
         .att$("class", "widget-element"), filterPreview.att$("class", "widget-element")).att$("class", "widget");
     var gl = filterPreview.getContext("webgl", { antialias: false, alpha: false });
@@ -348,7 +348,7 @@ function FilterSelector() {
                 delay: dt * 1000,
                 dispose: 2,
             });
-            renderProgress.style.width = (t / duration) * 50 + "%";
+            renderProgress.style.width = "".concat((t / duration) * 50, "%");
             t += dt;
         }
         gif.on('finished', function (blob) {
@@ -360,7 +360,7 @@ function FilterSelector() {
             renderSpinner.style.display = "none";
         });
         gif.on('progress', function (p) {
-            renderProgress.style.width = 50 + p * 50 + "%";
+            renderProgress.style.width = "".concat(50 + p * 50, "%");
         });
         gif.render();
         return gif;
@@ -416,6 +416,6 @@ window.onload = function () {
             gif.abort();
         }
         var fileName = imageSelector.selectedFileName$();
-        gif = filterSelector.render$(fileName + ".gif");
+        gif = filterSelector.render$("".concat(fileName, ".gif"));
     };
 };
