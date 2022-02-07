@@ -203,8 +203,8 @@ var filters = {
                 "step": 1.0,
             },
         },
-        "vertex": "#version 100\nprecision mediump float;\n\nattribute vec2 meshPosition;\n\nuniform vec2 resolution;\nuniform float time;\n\nvarying vec2 uv;\n\nvoid main() {\n    gl_Position = vec4(meshPosition, 0.0, 1.0);\n    uv = (meshPosition + 1.0) / 2.0;\n}\n",
-        "fragment": "\n#version 100\n\nprecision mediump float;\n\nuniform vec2 resolution;\nuniform float time;\nuniform float duration;\nuniform float delay;\nuniform float pixelization;\n\nuniform sampler2D emote;\n\nvarying vec2 uv;\n\n// https://www.aussiedwarf.com/2017/05/09/Random10Bit.html\nfloat rand(vec2 co){\n  vec3 product = vec3(  sin( dot(co, vec2(0.129898,0.78233))),\n                        sin( dot(co, vec2(0.689898,0.23233))),\n                        sin( dot(co, vec2(0.434198,0.51833))) );\n  vec3 weighting = vec3(4.37585453723, 2.465973, 3.18438);\n  return fract(dot(weighting, product));\n}\n\nvoid main() {\n    float pixelated_resolution = 112.0 / pixelization;\n    vec2 pixelated_uv = floor(uv * pixelated_resolution);\n    float noise = (rand(pixelated_uv) + 1.0) / 2.0;\n    float slope = (0.2 + noise * 0.8) * (1.0 - (0.0 + uv.x * 0.5));\n    float time_interval = 1.1 + delay * 2.0;\n    float progress = 0.2 + delay + slope - mod(time_interval * time / duration, time_interval);\n    float mask = progress > 0.1 ? 1.0 : 0.0;\n    vec4 pixel = texture2D(emote, vec2(uv.x * (progress > 0.5 ? 1.0 : progress * 2.0), 1.0 - uv.y));\n    pixel.w = floor(pixel.w + 0.5);\n    gl_FragColor = pixel * vec4(vec3(1.0), mask);\n}\n",
+        "vertex": new VertexShaderFetcher("Thanosed"),
+        "fragment": new FragmentShaderFetcher("Thanosed"),
     },
     "Ripple": {
         "transparent": 0x00FF00 + "",
@@ -235,7 +235,7 @@ var filters = {
                 "step": 0.01,
             }
         },
-        "vertex": "#version 100\nprecision mediump float;\n\nattribute vec2 meshPosition;\n\nuniform vec2 resolution;\nuniform float time;\n\nvarying vec2 uv;\n\nvoid main() {\n    gl_Position = vec4(meshPosition, 0.0, 1.0);\n    uv = (meshPosition + 1.0) / 2.0;\n}\n",
-        "fragment": "#version 100\n\nprecision mediump float;\n\nuniform vec2 resolution;\nuniform float time;\n\nuniform sampler2D emote;\n\nuniform float a;\nuniform float b;\nuniform float c;\n\nvarying vec2 uv;\n\nvoid main() {\n    vec2 pos = vec2(uv.x, 1.0 - uv.y);\n    vec2 center = vec2(0.5);\n    vec2 dir = pos - center;\n    float x = length(dir);\n    float y = sin(x + time);\n    vec4 pixel = texture2D(emote, pos + cos(x*a - time*b)*c*(dir/x));\n    gl_FragColor = pixel;\n    gl_FragColor.w = floor(gl_FragColor.w + 0.5);\n}\n",
+        "vertex": new VertexShaderFetcher("Ripple"),
+        "fragment": new FragmentShaderFetcher("Ripple"),
     }
 };
