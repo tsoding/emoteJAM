@@ -512,7 +512,21 @@ function FilterSelector() {
 }
 
 window.onload = () => {
-    feature_params = new URLSearchParams(document.location.search).has("feature-params");
+    if (URLSearchParams) {
+        feature_params = new URLSearchParams(document.location.search).has("feature-params");
+    } else {
+        // IE support
+        const query = document.location.toString().split('?')[1];
+        feature_params = false;
+        if (query) {
+            // IE doesnt have Array.includes()
+            for (const el of query.split('&')) {
+                if (el === "feature-params") {
+                    feature_params = true;
+                }
+            }
+        }
+    }
 
     const filterSelectorEntry = document.getElementById('filter-selector-entry');
     if (filterSelectorEntry === null) {
