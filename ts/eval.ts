@@ -4,6 +4,7 @@ type BinaryOpFunc = (lhs: number, rhs: number) => number;
 enum BinaryPrec {
     PREC0 = 0,
     PREC1,
+    PREC2,
     COUNT_PRECS
 }
 
@@ -19,19 +20,19 @@ const BINARY_OPS: {[op in BinaryOp]: BinaryOpDef} = {
     },
     '-': {
         func: (lhs, rhs) => lhs - rhs,
-        prec: BinaryPrec.PREC0
+        prec: BinaryPrec.PREC1
     },
     '*': {
         func: (lhs, rhs) => lhs * rhs,
-        prec: BinaryPrec.PREC1
+        prec: BinaryPrec.PREC2
     },
     '/': {
         func: (lhs, rhs) => lhs / rhs,
-        prec: BinaryPrec.PREC1
+        prec: BinaryPrec.PREC2
     },
     '%': {
         func: (lhs, rhs) => lhs % rhs,
-        prec: BinaryPrec.PREC1
+        prec: BinaryPrec.PREC2
     }
 };
 
