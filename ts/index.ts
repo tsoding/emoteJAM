@@ -512,6 +512,22 @@ function FilterSelector() {
 }
 
 window.onload = () => {
+    fetch("gif.worker.js").then(() => {
+        console.log("Prefetched gif.worker.js");
+    });
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register('/serviceworker.js').then(
+            (registration) => {
+                console.log("Registered a Service Worker ", registration);
+            },
+            (error) => {
+                console.error("Could not register a Service Worker ", error);
+            },
+        );
+    } else {
+        console.error("Service Workers are not supported in this browser");
+    }
+
     feature_params = new URLSearchParams(document.location.search).has("feature-params");
 
     const filterSelectorEntry = document.getElementById('filter-selector-entry');

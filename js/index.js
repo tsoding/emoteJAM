@@ -382,6 +382,17 @@ function FilterSelector() {
     return root;
 }
 window.onload = function () {
+    fetch("gif.worker.js");
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register('/serviceworker.js').then(function (registration) {
+            console.log("Registered a Service Worker ", registration);
+        }, function (error) {
+            console.error("Could not register a Service Worker ", error);
+        });
+    }
+    else {
+        console.error("Service Workers are not supported in this browser");
+    }
     feature_params = new URLSearchParams(document.location.search).has("feature-params");
     var filterSelectorEntry = document.getElementById('filter-selector-entry');
     if (filterSelectorEntry === null) {
