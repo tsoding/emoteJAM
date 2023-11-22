@@ -72,7 +72,7 @@ function watch(part, ...args) {
 
 const [nodePath, scriptPath, command, ...args] = process.argv;
 
-if (command === undefined) {
+if (command === undefined || command === 'build') {
     build(...args);
 } else if (command === 'watch') {
     watch(...args);
