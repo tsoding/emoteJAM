@@ -14,8 +14,9 @@ function cmd(program, args) {
 }
 
 const commonTscFlags = [
-    '--strict', 'true',
-    '--removeComments', 'true'
+    '--strict',
+    '--removeComments',
+    '--skipLibCheck',
 ];
 
 const mainTs = [
@@ -38,7 +39,6 @@ function tscServiceWorker(...extraParams) {
     cmd('tsc', [
         ...commonTscFlags,
         '--lib', 'webworker',
-        '--skipLibCheck', 'true',
         '--outFile', 'serviceworker.js',
         ...extraParams,
         'serviceworker.ts'
