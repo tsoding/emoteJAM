@@ -19,7 +19,39 @@ $ iexplore.exe http://localhost:6969/
 
 ## Building
 
-TBD
+The whole build is organized so you can just serve the repo via an HTTP server and it just works. This is done to simplify deployment to [GitHub pages](https://pages.github.com/). We just tell GitHub to service this repo as is. The build artifacts are also commited to the repo. So if you want to simply get the website working you don't even have to build anything. Just serve the repo.
+
+This build consist of two parts: `main` and `serviceworker`. This separation is important because these two parts are built with different TypeScript flags and dependancies. We are planning to get rid of the separation in the future somehow.
+
+The build is done via the [./build.js](./build.js) script. It is recommended to read it to get an idea on how it works. It is also recommended to check the `"scripts"` section of [./package.json](./package.json) to get an idea on how it is called from `npm run`.
+
+Before doing any building make sure you installed all the necessary dependencies:
+
+```console
+$ npm install
+```
+
+To build both of the parts:
+
+```console
+$ npm run build
+```
+
+### Building `main` part only
+
+```console
+$ npm run build -- main
+```
+
+This command takes all the files [./ts/](./ts/) and compiles them to JavaScript in [./js/](./js/).
+
+### Building `serviceworker` part
+
+```console
+$ npm run build -- serviceworker
+```
+
+This compiles [./serviceworker.ts](./serviceworker.ts) to [./serviceworker.js](./serviceworker.js).
 
 ## Watching
 
