@@ -1,6 +1,7 @@
 const child_process = require("child_process");
 const spawn = child_process.spawn;
 
+// TODO: promisify cmd
 function cmd(program, args) {
     console.log('CMD:', program, args);
     const p = spawn(program, args);
@@ -45,26 +46,27 @@ function tscServiceWorker(...extraParams) {
     ]);
 }
 
-function build(target, ...args) {
-    if (target === undefined) {
+function build(part, ...args) {
+    if (part === undefined) {
         tscServiceWorker();
         tscMain();
-    } else if (target === 'main') {
+    } else if (part === 'main') {
         tscMain();
-    } else if (target === 'serviceworker') {
+    } else if (part === 'serviceworker') {
         tscServiceWorker();
     } else {
-        throw new Error(`Unknown build target {target}`);
+        throw new Error(`Unknown build part {part}`);
     }
 }
 
-function watch(target, ...args) {
-    if (target === undefined || target === 'main') {
+function watch(part, ...args) {
+    if (part === undefined || part === 'main') {
+        // TODO: is it possible to watch both parts?
         tscMain('-w');
-    } else if (target === 'serviceworker') {
+    } else if (part === 'serviceworker') {
         tscServiceWorker('-w');
     } else {
-        throw new Error(`Unknown watch target {target}`);
+        throw new Error(`Unknown watch part {part}`);
     }
 }
 
