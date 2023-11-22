@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Simple website that generates animated BTTV emotes from static images",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js watch",

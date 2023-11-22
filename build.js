@@ -1,5 +1,4 @@
-const child_process = require("child_process");
-const spawn = child_process.spawn;
+import { spawn } from 'child_process';
 
 // TODO: promisify cmd
 function cmd(program, args) {
