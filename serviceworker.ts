@@ -1,4 +1,3 @@
-
 self.addEventListener("install", (event) => {
     console.log("Pog! Looks like we installed something! I have no idea what that means, but here is an object the browser sent us", event);
 });
@@ -28,4 +27,3 @@ self.addEventListener("fetch", (e) => {
         })());
     }
 });
-

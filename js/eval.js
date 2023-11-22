@@ -28,7 +28,7 @@ var BINARY_OPS = {
     }
 };
 var UNARY_OPS = {
-    '-': function (arg) { return -arg; },
+    '-': function (arg) { return -arg; }
 };
 var Lexer = (function () {
     function Lexer(src) {
@@ -73,8 +73,8 @@ function parse_primary(lexer) {
                 "kind": "unary_op",
                 "payload": {
                     "op": token,
-                    "operand": operand,
-                },
+                    "operand": operand
+                }
             };
         }
         else if (token === '(') {
@@ -98,7 +98,7 @@ function parse_primary(lexer) {
                         "kind": "funcall",
                         "payload": {
                             "name": token,
-                            "args": args,
+                            "args": args
                         }
                     };
                 }
@@ -119,7 +119,7 @@ function parse_primary(lexer) {
                     "kind": "funcall",
                     "payload": {
                         "name": token,
-                        "args": args,
+                        "args": args
                     }
                 };
             }
@@ -155,7 +155,7 @@ function parse_expr(lexer, prec) {
                 "payload": {
                     "op": op_token,
                     "lhs": lhs,
-                    "rhs": rhs,
+                    "rhs": rhs
                 }
             };
         }
