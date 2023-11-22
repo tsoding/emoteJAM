@@ -1,9 +1,8 @@
 import { spawn } from 'child_process';
 
-// TODO: promisify cmd
 function cmd(program, args) {
     console.log('CMD:', program, args);
-    const p = spawn(program, args);
+    const p = spawn(program, args.flat()); // NOTE: flattening the args array enables you to group related arguments for better self-documentation of the running command
     p.stdout.on('data', (data) => process.stdout.write(data));
     p.stderr.on('data', (data) => process.stderr.write(data));
     p.on('close', (code) => {
@@ -30,53 +29,71 @@ const mainTs = [
 function tscMain(...extraParams) {
     cmd('tsc', [
         ...commonTscFlags,
-        '--outDir', 'js',
+        ['--outDir', 'js'],
         ...extraParams,
-        ...mainTs,
+        mainTs,
     ]);
 }
 
 function tscServiceWorker(...extraParams) {
     cmd('tsc', [
         ...commonTscFlags,
-        '--lib', 'webworker',
-        '--outFile', 'serviceworker.js',
+        ['--lib', 'webworker'],
+        ['--outFile', 'serviceworker.js'],
         ...extraParams,
         'serviceworker.ts'
     ]);
 }
 
 function build(part, ...args) {
-    if (part === undefined) {
+    switch (part) {
+    case undefined:
         tscServiceWorker();
         tscMain();
-    } else if (part === 'main') {
+        break;
+    case 'main':
         tscMain();
-    } else if (part === 'serviceworker') {
+        break;
+    case 'serviceworker':
         tscServiceWorker();
-    } else {
-        throw new Error(`Unknown build part {part}`);
+        break;
+    default:
+        throw new Error(`Unknown build part ${part}. Available parts: main, serviceworker.`);
     }
 }
 
 function watch(part, ...args) {
-    if (part === undefined || part === 'main') {
-        // TODO: is it possible to watch both parts?
-        tscMain('-w');
-    } else if (part === 'serviceworker') {
-        tscServiceWorker('-w');
-    } else {
-        throw new Error(`Unknown watch part {part}`);
+    switch (part) {
+    case undefined:
+        tscMain('-w', '--preserveWatchOutput');
+        tscServiceWorker('-w', '--preserveWatchOutput');
+        break;
+    case 'main':
+        tscMain('-w', '--preserveWatchOutput');
+        break;
+    case 'serviceworker':
+        tscServiceWorker('-w', '--preserveWatchOutput');
+        break;
+    default:
+        throw new Error(`Unknown watch part ${part}. Available parts: main, serviceworker.`);
     }
 }
 
 const [nodePath, scriptPath, command, ...args] = process.argv;
-
-if (command === undefined || command === 'build') {
+switch (command) {
+case undefined:
+case 'build':
     build(...args);
-} else if (command === 'watch') {
+    break;
+case 'watch':
     watch(...args);
-} else {
-    // TODO: add `serve` command
-    throw new Error(`Unknown command {command}`);
+    break;
+case 'serve':
+    // TODO: maybe replace Python with something from Node itself?
+    // Python is a pretty unreasonable dependency.
+    cmd('python3', [['-m', 'http.server'], '6969']);
+    watch();
+    break;
+default:
+    throw new Error(`Unknown command ${command}. Available commands: build, watch.`);
 }

@@ -55,7 +55,11 @@ This compiles [./serviceworker.ts](./serviceworker.ts) to [./serviceworker.js](.
 
 ## Watching
 
-The [./build.js](./build.js) script enables you to  [Watch](https://www.typescriptlang.org/docs/handbook/configuring-watch.html#handbook-content) the source code. Since the build is split into two separate parts you have to watch them separately for now:
+The [./build.js](./build.js) script enables you to  [Watch](https://www.typescriptlang.org/docs/handbook/configuring-watch.html#handbook-content) the source code:
+
+```console
+$ npm run watch
+```
 
 To watch the `main` part:
 ```console
