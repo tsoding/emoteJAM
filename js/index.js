@@ -382,9 +382,6 @@ function FilterSelector() {
     return root;
 }
 window.onload = function () {
-    fetch("gif.worker.js").then(function () {
-        console.log("Prefetched gif.worker.js");
-    });
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register('/serviceworker.js').then(function (registration) {
             console.log("Registered a Service Worker ", registration);
@@ -393,7 +390,7 @@ window.onload = function () {
         });
     }
     else {
-        console.error("Service Workers are not supported in this browser");
+        console.error("Service Workers are not supported in this browser.");
     }
     feature_params = new URLSearchParams(document.location.search).has("feature-params");
     var filterSelectorEntry = document.getElementById('filter-selector-entry');

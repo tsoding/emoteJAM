@@ -512,9 +512,6 @@ function FilterSelector() {
 }
 
 window.onload = () => {
-    fetch("gif.worker.js").then(() => {
-        console.log("Prefetched gif.worker.js");
-    });
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register('/serviceworker.js').then(
             (registration) => {
@@ -525,7 +522,7 @@ window.onload = () => {
             },
         );
     } else {
-        console.error("Service Workers are not supported in this browser");
+        console.error("Service Workers are not supported in this browser.");
     }
 
     feature_params = new URLSearchParams(document.location.search).has("feature-params");

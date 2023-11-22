@@ -35,14 +35,52 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-self.addEventListener("install", function (event) {
-    console.log("Pog! Looks like we installed something! I have no idea what that means, but here is an object the browser sent us", event);
+var assets = [
+    '/index.html',
+    '/css/bright.css',
+    '/css/main.css',
+    '/css/reset.css',
+    '/gif.js',
+    '/gif.worker.js',
+    '/img/tsodinClown.png',
+    '/js/eval.js',
+    '/js/filters.js',
+    '/js/grecha.js',
+    '/js/index.js',
+];
+self.addEventListener("install", function (e) {
+    var event = e;
+    event.waitUntil((function () { return __awaiter(void 0, void 0, void 0, function () {
+        var _i, assets_1, asset, cache, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _i = 0, assets_1 = assets;
+                    _a.label = 1;
+                case 1:
+                    if (!(_i < assets_1.length)) return [3, 5];
+                    asset = assets_1[_i];
+                    return [4, caches.open("v1")];
+                case 2:
+                    cache = _a.sent();
+                    console.log("Caching " + asset + "...");
+                    return [4, fetch(asset)];
+                case 3:
+                    response = _a.sent();
+                    cache.put(asset, response.clone());
+                    _a.label = 4;
+                case 4:
+                    _i++;
+                    return [3, 1];
+                case 5: return [2];
+            }
+        });
+    }); })());
 });
 self.addEventListener("fetch", function (e) {
     var event = e;
     if (!navigator.onLine) {
-        console.log("We are offline! Serving request from the cache.");
-        event.respondWith(caches.match(event.request).then(function (response) {
+        event.respondWith(caches.match(event.request.url).then(function (response) {
             if (response !== undefined) {
                 return response;
             }
@@ -55,7 +93,6 @@ self.addEventListener("fetch", function (e) {
         }));
     }
     else {
-        console.log("We are online! Forwarding the request.");
         event.respondWith((function () { return __awaiter(void 0, void 0, void 0, function () {
             var response, cache;
             return __generator(this, function (_a) {
@@ -66,7 +103,7 @@ self.addEventListener("fetch", function (e) {
                         return [4, caches.open("v1")];
                     case 2:
                         cache = _a.sent();
-                        cache.put(event.request, response.clone());
+                        cache.put(event.request.url, response.clone());
                         return [2, response];
                 }
             });
