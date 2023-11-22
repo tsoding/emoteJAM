@@ -11,6 +11,7 @@ function cmd(program, args) {
             console.error(program, args, 'exited with', code);
         }
     });
+    return p;
 }
 
 const commonTscFlags = [
