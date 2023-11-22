@@ -77,5 +77,6 @@ if (command === undefined) {
 } else if (command === 'watch') {
     watch(...args);
 } else {
+    // TODO: add `serve` command
     throw new Error(`Unknown command {command}`);
 }
