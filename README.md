@@ -55,7 +55,17 @@ This compiles [./serviceworker.ts](./serviceworker.ts) to [./serviceworker.js](.
 
 ## Watching
 
-TBD
+The [./build.js](./build.js) script enables you to  [Watch](https://www.typescriptlang.org/docs/handbook/configuring-watch.html#handbook-content) the source code. Since the build is split into two separate parts you have to watch them separately for now:
+
+To watch the `main` part:
+```console
+$ npm run watch -- main
+```
+
+To watch the `serviceworker` part:
+```console
+$ npm run watch -- serviceworker
+```
 
 # Filter Development
 
