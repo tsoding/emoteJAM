@@ -35,6 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var cacheName = "emoteJAM-v1";
 var assets = [
     '/index.html',
     '/css/bright.css',
@@ -49,29 +50,51 @@ var assets = [
     '/js/index.js',
 ];
 self.addEventListener("install", function (e) {
+    console.log("[Service Worker] Install");
     var event = e;
     event.waitUntil((function () { return __awaiter(void 0, void 0, void 0, function () {
-        var _i, assets_1, asset, cache, response;
+        var cache;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _i = 0, assets_1 = assets;
-                    _a.label = 1;
+                    console.log("[Service Worker] Caching all the assets");
+                    return [4, caches.open(cacheName)];
                 case 1:
-                    if (!(_i < assets_1.length)) return [3, 5];
-                    asset = assets_1[_i];
-                    return [4, caches.open("v1")];
-                case 2:
                     cache = _a.sent();
-                    console.log("Caching " + asset + "...");
-                    return [4, fetch(asset)];
+                    cache.addAll(assets);
+                    return [2];
+            }
+        });
+    }); })());
+});
+self.addEventListener("activate", function (e) {
+    console.log("[Service Worker] Activate");
+    var event = e;
+    event.waitUntil((function () { return __awaiter(void 0, void 0, void 0, function () {
+        var keys, _a, _b, _i, key;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    console.log("[Service Worker] Cleaning up all caches");
+                    return [4, caches.keys()];
+                case 1:
+                    keys = _c.sent();
+                    _a = [];
+                    for (_b in keys)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3, 5];
+                    key = _a[_i];
+                    if (!(key !== cacheName)) return [3, 4];
+                    return [4, caches["delete"](key)];
                 case 3:
-                    response = _a.sent();
-                    cache.put(asset, response.clone());
-                    _a.label = 4;
+                    _c.sent();
+                    _c.label = 4;
                 case 4:
                     _i++;
-                    return [3, 1];
+                    return [3, 2];
                 case 5: return [2];
             }
         });
@@ -79,34 +102,27 @@ self.addEventListener("install", function (e) {
 });
 self.addEventListener("fetch", function (e) {
     var event = e;
-    if (!navigator.onLine) {
-        event.respondWith(caches.match(event.request.url).then(function (response) {
-            if (response !== undefined) {
-                return response;
+    event.respondWith((function () { return __awaiter(void 0, void 0, void 0, function () {
+        var cache, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    console.log("[Service Worker] Fetch " + event.request.url);
+                    return [4, caches.open(cacheName)];
+                case 1:
+                    cache = _a.sent();
+                    return [4, cache.match(event.request)];
+                case 2:
+                    response = _a.sent();
+                    if (!(response === undefined)) return [3, 4];
+                    console.log("[Service Worker] Response for " + event.request.url + " is not available in cache. Making an actual request...");
+                    return [4, fetch(event.request)];
+                case 3:
+                    response = _a.sent();
+                    cache.put(event.request, response.clone());
+                    _a.label = 4;
+                case 4: return [2, response];
             }
-            var headers = new Headers();
-            headers.append("Content-Type", "text/html");
-            return new Response("<h1>You are offline! LoooooLL!!11 4HEad</h1>", {
-                status: 200,
-                headers: headers
-            });
-        }));
-    }
-    else {
-        event.respondWith((function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response, cache;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, fetch(event.request)];
-                    case 1:
-                        response = _a.sent();
-                        return [4, caches.open("v1")];
-                    case 2:
-                        cache = _a.sent();
-                        cache.put(event.request.url, response.clone());
-                        return [2, response];
-                }
-            });
-        }); })());
-    }
+        });
+    }); })());
 });

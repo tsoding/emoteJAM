@@ -1,3 +1,4 @@
+const cacheName = "emoteJAM-v1";
 const assets = [
     '/index.html',
     '/css/bright.css',
@@ -13,38 +14,40 @@ const assets = [
 ];
 
 self.addEventListener("install", e => {
+    console.log("[Service Worker] Install");
     const event = e as ExtendableEvent;
     event.waitUntil((async () => {
-        for (let asset of assets) {
-            const cache = await caches.open("v1");
-            console.log(`Caching ${asset}...`);
-            const response = await fetch(asset);
-            cache.put(asset, response.clone());
+        console.log("[Service Worker] Caching all the assets");
+        const cache = await caches.open(cacheName);
+        cache.addAll(assets);
+    })());
+});
+
+self.addEventListener("activate", e => {
+    console.log("[Service Worker] Activate");
+    const event = e as ExtendableEvent;
+    event.waitUntil((async() => {
+        console.log("[Service Worker] Cleaning up all caches");
+        const keys = await caches.keys();
+        for (let key in keys) {
+            if (key !== cacheName) {
+                await caches.delete(key);
+            }
         }
     })());
 });
 
 self.addEventListener("fetch", (e) => {
     const event = e as FetchEvent;
-    if (!navigator.onLine) {
-        event.respondWith(caches.match(event.request.url).then((response) => {
-            if (response !== undefined) {
-                return response;
-            }
-            const headers = new Headers();
-            headers.append("Content-Type", "text/html");
-            // TODO: better 404 for service worker
-            return new Response("<h1>You are offline! LoooooLL!!11 4HEad</h1>", {
-                status: 200,
-                headers: headers
-            });
-        }));
-    } else {
-        event.respondWith((async () => {
-            const response = await fetch(event.request);
-            const cache = await caches.open("v1");
-            cache.put(event.request.url, response.clone());
-            return response;
-        })());
-    }
+    event.respondWith((async () => {
+        console.log(`[Service Worker] Fetch ${event.request.url}`);
+        const cache = await caches.open(cacheName);
+        let response = await cache.match(event.request);
+        if (response === undefined) {
+            console.log(`[Service Worker] Response for ${event.request.url} is not available in cache. Making an actual request...`);
+            response = await fetch(event.request);
+            cache.put(event.request, response.clone());
+        }
+        return response;
+    })());
 });
