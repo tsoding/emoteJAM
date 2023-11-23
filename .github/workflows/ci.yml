@@ -2,13 +2,13 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  node-13-typescript:
+  node-20-typescript:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '13'
+          node-version: '20'
       - run: npm install
-      - run: ./node_modules/.bin/tsc
+      - run: npm run build
       - run: git diff --exit-code

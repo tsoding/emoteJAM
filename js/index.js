@@ -71,7 +71,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
     var uniforms = {
         "resolution": gl.getUniformLocation(id, 'resolution'),
         "time": gl.getUniformLocation(id, 'time'),
-        "emoteSize": gl.getUniformLocation(id, 'emoteSize'),
+        "emoteSize": gl.getUniformLocation(id, 'emoteSize')
     };
     var paramsPanel = div().att$("class", "widget-element");
     var paramsInputs = {};
@@ -129,7 +129,7 @@ function loadFilterProgram(gl, filter, vertexAttribs) {
         "uniforms": uniforms,
         "duration": compile_expr(filter.duration),
         "transparent": filter.transparent,
-        "paramsPanel": paramsPanel,
+        "paramsPanel": paramsPanel
     };
 }
 function ImageSelector() {
@@ -286,7 +286,7 @@ function FilterSelector() {
             quality: 10,
             width: CANVAS_WIDTH,
             height: CANVAS_HEIGHT,
-            transparent: program.transparent,
+            transparent: program.transparent
         });
         var context = {
             "vars": {
@@ -346,7 +346,7 @@ function FilterSelector() {
             }
             gif.addFrame(new ImageData(pixels, CANVAS_WIDTH, CANVAS_HEIGHT), {
                 delay: dt * 1000,
-                dispose: 2,
+                dispose: 2
             });
             renderProgress.style.width = (t / duration) * 50 + "%";
             t += dt;
@@ -382,6 +382,16 @@ function FilterSelector() {
     return root;
 }
 window.onload = function () {
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register('/serviceworker.js').then(function (registration) {
+            console.log("Registered a Service Worker ", registration);
+        }, function (error) {
+            console.error("Could not register a Service Worker ", error);
+        });
+    }
+    else {
+        console.error("Service Workers are not supported in this browser.");
+    }
     feature_params = new URLSearchParams(document.location.search).has("feature-params");
     var filterSelectorEntry = document.getElementById('filter-selector-entry');
     if (filterSelectorEntry === null) {

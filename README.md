@@ -17,13 +17,39 @@ $ python3 -m http.server 6969
 $ iexplore.exe http://localhost:6969/
 ```
 
-## Development Workflow
+## Building
 
-1. `$ npm install`
-2. `$ ./node_modules/.bin/tsc -w`
-3. `<edit files>`
+The whole build is organized so you can just serve the repo via an HTTP server and it just works. This is done to simplify deployment to [GitHub pages](https://pages.github.com/). We just tell GitHub to service this repo as is. The build artifacts are also commited to the repo. So if you want to simply get the website working you don't even have to build anything. Just serve the repo.
 
-Make sure that you commit the generated `js/*` files along with your changes. This is important for the project to retain that "Just deploy the repo" attitude.
+The build is done via the [./build.js](./build.js) script. It is recommended to read it to get an idea on how it works. It is also recommended to check the `"scripts"` section of [./package.json](./package.json) to get an idea on how it is called from `npm run`.
+
+Before doing any building make sure you installed all the necessary dependencies:
+
+```console
+$ npm install
+```
+
+To build all the artifacts
+
+```console
+$ npm run build
+```
+
+## Watching
+
+The [./build.js](./build.js) script enables you to  [Watch](https://www.typescriptlang.org/docs/handbook/configuring-watch.html#handbook-content) the source code:
+
+```console
+$ npm run watch
+```
+
+## Serving and Watching
+
+```console
+$ npm run service
+```
+
+This starts both `python3 -m http.server 6969` and [Watching](#Watching) at the same time, providing a convenient development environment.
 
 # Filter Development
 
