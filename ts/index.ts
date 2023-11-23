@@ -513,7 +513,7 @@ function FilterSelector() {
 
 window.onload = () => {
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register('/serviceworker.js').then(
+        navigator.serviceWorker.register('serviceworker.js').then(
             (registration) => {
                 console.log("Registered a Service Worker ", registration);
             },

@@ -1,16 +1,16 @@
 const cacheName = "emoteJAM-v1";
 const assets = [
-    '/index.html',
-    '/css/bright.css',
-    '/css/main.css',
-    '/css/reset.css',
-    '/gif.js',
-    '/gif.worker.js',
-    '/img/tsodinClown.png',
-    '/js/eval.js',
-    '/js/filters.js',
-    '/js/grecha.js',
-    '/js/index.js',
+    'index.html',
+    'css/bright.css',
+    'css/main.css',
+    'css/reset.css',
+    'gif.js',
+    'gif.worker.js',
+    'img/tsodinClown.png',
+    'js/eval.js',
+    'js/filters.js',
+    'js/grecha.js',
+    'js/index.js',
 ];
 
 self.addEventListener("install", e => {

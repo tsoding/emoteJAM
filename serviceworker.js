@@ -37,17 +37,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var cacheName = "emoteJAM-v1";
 var assets = [
-    '/index.html',
-    '/css/bright.css',
-    '/css/main.css',
-    '/css/reset.css',
-    '/gif.js',
-    '/gif.worker.js',
-    '/img/tsodinClown.png',
-    '/js/eval.js',
-    '/js/filters.js',
-    '/js/grecha.js',
-    '/js/index.js',
+    'index.html',
+    'css/bright.css',
+    'css/main.css',
+    'css/reset.css',
+    'gif.js',
+    'gif.worker.js',
+    'img/tsodinClown.png',
+    'js/eval.js',
+    'js/filters.js',
+    'js/grecha.js',
+    'js/index.js',
 ];
 self.addEventListener("install", function (e) {
     console.log("[Service Worker] Install");

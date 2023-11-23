@@ -383,7 +383,7 @@ function FilterSelector() {
 }
 window.onload = function () {
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register('/serviceworker.js').then(function (registration) {
+        navigator.serviceWorker.register('serviceworker.js').then(function (registration) {
             console.log("Registered a Service Worker ", registration);
         }, function (error) {
             console.error("Could not register a Service Worker ", error);
