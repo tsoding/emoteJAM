@@ -42,11 +42,11 @@ self.addEventListener("fetch", (e) => {
     event.respondWith((async () => {
         console.log(`[Service Worker] Fetch ${event.request.url}`);
         const cache = await caches.open(cacheName);
-        let response = await cache.match(event.request);
+        let response = await cache.match(event.request.url);
         if (response === undefined) {
             console.log(`[Service Worker] Response for ${event.request.url} is not available in cache. Making an actual request...`);
-            response = await fetch(event.request);
-            cache.put(event.request, response.clone());
+            response = await fetch(event.request.url);
+            cache.put(event.request.url, response.clone());
         }
         return response;
     })());

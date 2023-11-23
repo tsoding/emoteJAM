@@ -111,15 +111,15 @@ self.addEventListener("fetch", function (e) {
                     return [4, caches.open(cacheName)];
                 case 1:
                     cache = _a.sent();
-                    return [4, cache.match(event.request)];
+                    return [4, cache.match(event.request.url)];
                 case 2:
                     response = _a.sent();
                     if (!(response === undefined)) return [3, 4];
                     console.log("[Service Worker] Response for " + event.request.url + " is not available in cache. Making an actual request...");
-                    return [4, fetch(event.request)];
+                    return [4, fetch(event.request.url)];
                 case 3:
                     response = _a.sent();
-                    cache.put(event.request, response.clone());
+                    cache.put(event.request.url, response.clone());
                     _a.label = 4;
                 case 4: return [2, response];
             }
