@@ -12,7 +12,7 @@ interface BinaryOpDef {
     prec: BinaryPrec
 }
 
-const BINARY_OPS: {[op in BinaryOp]: BinaryOpDef} = {
+const BINARY_OPS: Record<BinaryOp, BinaryOpDef> = {
     '+': {
         func: (lhs, rhs) => lhs + rhs,
         prec: BinaryPrec.PREC0
@@ -38,7 +38,7 @@ const BINARY_OPS: {[op in BinaryOp]: BinaryOpDef} = {
 type UnaryOp = '-';
 type UnaryOpFunc = (arg: number) => number;
 
-const UNARY_OPS: {[op in UnaryOp]: UnaryOpFunc} = {
+const UNARY_OPS: Record<UnaryOp, UnaryOpFunc> = {
     '-': (arg: number) => -arg,
 };
 
